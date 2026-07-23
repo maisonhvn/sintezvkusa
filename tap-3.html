@@ -1,0 +1,98 @@
+﻿<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Кран 3 — Синтез Вкуса</title>
+  <meta name="description" content="Кран 3 — пиво в магазине Синтез Вкуса." />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <nav class="navbar" id="navbar">
+    <a href="index.html" class="navbar__logo" aria-label="На главную"><img src="assets/logo_navbar.png" alt="Синтез Вкуса" /></a>
+    <div class="navbar__spacer"></div>
+    <div class="navbar__links">
+      <a href="menu.html" class="nav-link" id="nav-menu">Меню</a>
+      <a href="contacts.html" class="nav-link" id="nav-contacts">Контакты</a>
+    </div>
+  </nav>
+  <main class="tap-page" id="tap-3">
+    <video class="tap-page__video" autoplay muted loop playsinline>
+      <source src="assets/6e46972a3e35f7c2233e95418193b27f — копия.mp4" type="video/mp4" />
+    </video>
+    <div class="tap-page__overlay"></div>
+    <div class="tap-page__split">
+      <div class="tap-page__photo-panel">
+        <div class="tap-page__photo-placeholder" id="tap-3-photo">
+          <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2">
+            <rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/>
+          </svg>
+          Фото пива
+        </div>
+      </div>
+      <div class="tap-page__info-panel">
+        <div class="tap-page__keg">
+          <div class="tap-page__badge">3</div>
+          <span class="tap-page__label">Кран 3</span>
+        </div>
+        <h1 class="tap-page__title" id="tap-3-name">Название пива</h1>
+        <p class="tap-page__subtitle" id="tap-3-style">Стиль пива</p>
+        <div class="tap-page__divider"></div>
+        <p class="tap-page__desc" id="tap-3-desc">Здесь будет описание сорта пива на кране 3. Добавьте текст.</p>
+        <table class="tap-page__table" id="tap-3-table">
+          <thead><tr><th>Характеристика</th><th>Значение</th></tr></thead>
+          <tbody>
+            <tr><td class="td-label">Крепость</td><td class="td-value" id="tap-3-abv">— %</td></tr>
+            <tr><td class="td-label">Горечь</td><td class="td-value" id="tap-3-ibu">— IBU</td></tr>
+            <tr><td class="td-label">Плотность</td><td class="td-value" id="tap-3-og">— °P</td></tr>
+            <tr><td class="td-label">Цвет</td><td class="td-value" id="tap-3-color">—</td></tr>
+            <tr><td class="td-label">Цена</td><td class="td-value" id="tap-3-price">— руб / литр</td></tr>
+          </tbody>
+        </table>
+        <a href="index.html" class="tap-page__back" id="tap-3-back">← На главную</a>
+      </div>
+    </div>
+  </main>
+  <footer class="footer" id="footer">
+    <a href="index.html" class="footer__logo"><img src="assets/logo_navbar.png" alt="Синтез Вкуса" /></a>
+    <nav class="footer__links"><a href="menu.html" id="footer-menu">Меню</a><a href="contacts.html" id="footer-contacts">Контакты</a></nav>
+  </footer>
+<script>
+  (function() {
+    var STORAGE_KEY = 'sv_taps'; var PHOTO_KEY = 'sv_photos';
+    var n = 3;
+    try {
+      var all = JSON.parse(localStorage.getItem(STORAGE_KEY)) || {};
+      var d = all[n] || {};
+      var set = function(id, val, fallback) {
+        var el = document.getElementById(id);
+        if (el && val) el.textContent = val;
+        else if (el && fallback) el.textContent = fallback;
+      };
+      set('tap-' + n + '-name',  d.name,  'Название пива');
+      set('tap-' + n + '-style', d.style, 'Стиль пива');
+      set('tap-' + n + '-desc',  d.desc,  'Описание появится после заполнения в редакторе.');
+      set('tap-' + n + '-abv',   d.abv,   '— %');
+      set('tap-' + n + '-ibu',   d.ibu,   '— IBU');
+      set('tap-' + n + '-og',    d.og,    '— °P');
+      set('tap-' + n + '-color', d.color, '—');
+      set('tap-' + n + '-price', d.price, '— руб / литр');
+      // Photo
+      try {
+        var photos = JSON.parse(localStorage.getItem(PHOTO_KEY)) || {};
+        if (photos[n]) {
+          var panel = document.getElementById('tap-' + n + '-photo');
+          if (panel) {
+            var img = document.createElement('img');
+            img.src = photos[n];
+            img.alt = 'Фото пива на кране ' + n;
+            img.className = 'tap-page__photo';
+            panel.parentNode.replaceChild(img, panel);
+          }
+        }
+      } catch(e2) {}
+    } catch(e) {}
+  })();
+</script>
+</body>
+</html>

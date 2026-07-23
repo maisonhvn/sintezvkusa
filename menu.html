@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Меню — Синтез Вкуса</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <nav class="navbar" id="navbar">
+    <a href="index.html" class="navbar__logo" aria-label="На главную">
+      <img src="assets/logo_navbar.png" alt="Синтез Вкуса" />
+    </a>
+    <div class="navbar__spacer"></div>
+    <div class="navbar__links">
+      <a href="menu.html" class="nav-link active" id="nav-menu">Меню</a>
+      <a href="contacts.html" class="nav-link" id="nav-contacts">Контакты</a>
+    </div>
+  </nav>
+
+
+  <!-- ═══════════════════ BEER GRID ═══════════════════ -->
+  <main class="beer-section">
+
+    <!-- Фоновое видео -->
+    <video class="menu__video" autoplay muted loop playsinline>
+      <source src="assets/4.mp4" type="video/mp4" />
+    </video>
+    <div class="menu__overlay"></div>
+
+    <div class="menu__content">
+      <div class="beer-menu-title" id="menu-title">МЕНЮ</div>
+      <div class="beer-grid beer-grid--14">
+
+      <a href="tap-1.html" class="beer-card beer-card--link" id="beer-1">
+        <span class="beer-card__num">01</span>
+        <span class="beer-card__name">Сорт пива</span>
+      </a>
+      <a href="tap-2.html" class="beer-card beer-card--link" id="beer-2">
+        <span class="beer-card__num">02</span>
+        <span class="beer-card__name">Сорт пива</span>
+      </a>
+      <a href="tap-3.html" class="beer-card beer-card--link" id="beer-3">
+        <span class="beer-card__num">03</span>
+        <span class="beer-card__name">Сорт пива</span>
+      </a>
+      <a href="tap-4.html" class="beer-card beer-card--link" id="beer-4">
+        <span class="beer-card__num">04</span>
+        <span class="beer-card__name">Сорт пива</span>
+      </a>
+      <a href="tap-5.html" class="beer-card beer-card--link" id="beer-5">
+        <span class="beer-card__num">05</span>
+        <span class="beer-card__name">Сорт пива</span>
+      </a>
+      <a href="tap-6.html" class="beer-card beer-card--link" id="beer-6">
+        <span class="beer-card__num">06</span>
+        <span class="beer-card__name">Сорт пива</span>
+      </a>
+      <a href="tap-7.html" class="beer-card beer-card--link" id="beer-7">
+        <span class="beer-card__num">07</span>
+        <span class="beer-card__name">Сорт пива</span>
+      </a>
+      <a href="tap-8.html" class="beer-card beer-card--link" id="beer-8">
+        <span class="beer-card__num">08</span>
+        <span class="beer-card__name">Сорт пива</span>
+      </a>
+      <a href="tap-9.html" class="beer-card beer-card--link" id="beer-9">
+        <span class="beer-card__num">09</span>
+        <span class="beer-card__name">Сорт пива</span>
+      </a>
+      <a href="tap-10.html" class="beer-card beer-card--link" id="beer-10">
+        <span class="beer-card__num">10</span>
+        <span class="beer-card__name">Сорт пива</span>
+      </a>
+      <a href="tap-11.html" class="beer-card beer-card--link" id="beer-11">
+        <span class="beer-card__num">11</span>
+        <span class="beer-card__name">Сорт пива</span>
+      </a>
+      <a href="tap-12.html" class="beer-card beer-card--link" id="beer-12">
+        <span class="beer-card__num">12</span>
+        <span class="beer-card__name">Сорт пива</span>
+      </a>
+      <a href="tap-13.html" class="beer-card beer-card--link" id="beer-13">
+        <span class="beer-card__num">13</span>
+        <span class="beer-card__name">Сорт пива</span>
+      </a>
+      <a href="tap-14.html" class="beer-card beer-card--link" id="beer-14">
+        <span class="beer-card__num">14</span>
+        <span class="beer-card__name">Сорт пива</span>
+      </a>
+
+    </div>   <!-- /beer-grid -->
+    </div>   <!-- /menu__content -->
+  </main>
+
+<script>
+  const menuTitle = document.getElementById('menu-title');
+  const navbar    = document.getElementById('navbar');
+  const section   = document.querySelector('.beer-section');
+  let navHidden = false;
+
+  menuTitle.addEventListener('click', () => {
+    navHidden = !navHidden;
+    if (navHidden) {
+      navbar.classList.add('navbar--hidden');
+      section.classList.add('navbar-hidden');
+    } else {
+      navbar.classList.remove('navbar--hidden');
+      section.classList.remove('navbar-hidden');
+    }
+  });
+</script>
+
+</body>
+</html>
