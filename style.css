@@ -183,10 +183,14 @@ a { text-decoration: none; color: inherit; }
 
 .hero__buttons {
   display: grid;
-  /* авто-колонки: минимум 90px, максимум 1fr — браузер сам считает сколько влезет */
-  grid-template-columns: repeat(auto-fill, minmax(clamp(90px, 12vw, 180px), 1fr));
-  gap: clamp(8px, 1.5vw, 16px);
-  width: calc(100% - 64px);
+  /*
+    150px → на телефоне 390px: (390-32px_паддинг-12px_gap)/150 ≈ 2 колонки
+    150px → на планшете 768px: ≈ 4 колонки
+    150px → на десктопе 1200px: ≈ 7 колонок
+  */
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: clamp(10px, 1.5vw, 16px);
+  width: calc(100% - 32px);
   margin: 0 auto;
   padding-bottom: 60px;
 }
