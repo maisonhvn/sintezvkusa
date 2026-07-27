@@ -183,9 +183,10 @@ a { text-decoration: none; color: inherit; }
 
 .hero__buttons {
   display: grid;
-  grid-template-columns: repeat(7, 1fr);
-  gap: 16px;
-  width: calc(100% - 96px);
+  /* авто-колонки: минимум 90px, максимум 1fr — браузер сам считает сколько влезет */
+  grid-template-columns: repeat(auto-fill, minmax(clamp(90px, 12vw, 180px), 1fr));
+  gap: clamp(8px, 1.5vw, 16px);
+  width: calc(100% - 64px);
   margin: 0 auto;
   padding-bottom: 60px;
 }
@@ -392,12 +393,37 @@ a { text-decoration: none; color: inherit; }
    ============================================ */
 
 @media (max-width: 768px) {
-  .navbar { padding: 0 20px; height: 62px; }
-  .navbar__logo img { height: 44px; }
+  .navbar { padding: 0 16px; height: 58px; }
+  .navbar__logo img { height: 40px; }
   .nav-link { font-size: 13px; padding: 8px 14px; }
 
-  .hero { padding: 90px 24px 60px; }
-  .hero__logo-wrap img { height: 160px; }
+  .hero {
+    padding: 76px 16px 40px;
+    min-height: 100svh;
+  }
+  .hero__logo-wrap { padding: 0 16px; }
+  .hero__logo-wrap img { height: 130px; }
+  .hero__welcome { font-size: clamp(22px, 6vw, 36px); padding: 0 16px; }
+  .hero__sub { font-size: 13px; padding: 0 16px; letter-spacing: 0.14em; }
+  .hero__divider { margin: 12px 0; }
+
+  /* Кнопки на мобильном: только корректируем отступы и размер бейджа */
+  .hero__buttons {
+    width: calc(100% - 0px);
+    padding-bottom: 32px;
+  }
+
+  .hero-btn {
+    border-radius: 10px;
+  }
+
+  .hero-btn__badge {
+    width: 22px;
+    height: 22px;
+    font-size: 11px;
+    bottom: 6px;
+    right: 6px;
+  }
 
   .features { padding: 50px 20px; }
 
@@ -408,7 +434,33 @@ a { text-decoration: none; color: inherit; }
   .page-hero { padding: 90px 20px 36px; }
   .page-content { padding: 36px 20px 80px; }
 
-  .beer-grid { grid-template-columns: 1fr; }
+  /* Меню-страница: 1 колонка на телефоне */
+  .beer-grid {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto;
+    grid-auto-flow: row;
+  }
+  .beer-grid--14 {
+    grid-template-rows: auto;
+  }
+  /* Убираем правую границу у левой колонки */
+  .beer-grid .beer-card:nth-child(-n+7),
+  .beer-grid .beer-card:nth-child(-n+10) {
+    border-right: none;
+  }
+  /* Последняя карточка тоже получает нижнюю границу */
+  .beer-grid--14 .beer-card:nth-child(7),
+  .beer-grid--14 .beer-card:nth-child(14) {
+    border-bottom: 1px solid var(--border);
+  }
+  .beer-grid--14 .beer-card:last-child {
+    border-bottom: none;
+  }
+  .beer-card {
+    padding: 0 20px;
+    min-height: 52px;
+  }
+  .beer-card__name { font-size: 16px; }
 }
 
 /* ============================================
