@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="ru">
 <head>
   <meta charset="UTF-8" />
@@ -459,7 +459,8 @@
   <div class="toast" id="toast">✓ Сохранено</div>
 
 <script>
-  const TAPS = 14;
+  const TAPS = 28;
+
   const STORAGE_KEY   = 'sv_taps';
   const PHOTO_KEY     = 'sv_photos';
 
@@ -669,6 +670,11 @@
   let currentTap = null;
   function selectTap(n) {
     document.getElementById('empty-state').style.display = 'none';
+    // Скрыть редактор фонов если открыт
+    const bgEditor = document.getElementById('bg-editor');
+    if (bgEditor) bgEditor.classList.remove('visible');
+    const sbBg = document.getElementById('sb-bg');
+    if (sbBg) sbBg.classList.remove('active');
     if (currentTap) {
       document.getElementById('sb-item-' + currentTap).classList.remove('active');
       document.getElementById('editor-' + currentTap).classList.remove('visible');
@@ -703,7 +709,7 @@
 
   // ── Reset all ──
   document.getElementById('btn-reset-all').addEventListener('click', function() {
-    if (!confirm('Сбросить ВСЕ данные и фото всех 14 кранов?')) return;
+    if (!confirm('Сбросить ВСЕ данные и фото всех 28 кранов?')) return;
     localStorage.removeItem(STORAGE_KEY);
     localStorage.removeItem(PHOTO_KEY);
     if (currentTap) populateEditor(currentTap);
@@ -711,12 +717,231 @@
     showToast('Все данные сброшены');
   });
 
+
   // ── Init ──
   buildSidebar();
   buildEditors();
   for (let n = 1; n <= TAPS; n++) initPhotoUpload(n);
   const hash = parseInt(location.hash.replace('#tap-', ''));
   if (hash >= 1 && hash <= TAPS) selectTap(hash);
+
+  // ══════════════════════════════════════════
+  //  УПРАВЛЕНИЕ ФОНАМИ (Главная / Меню / Краны)
+  // ══════════════════════════════════════════
+  const BG_KEY = 'sv_bg';
+
+  // Цели: id → { label, defaultOverlay, defaultVideo }
+  const BG_TARGETS = [
+    { id: 'index', label: 'Главная',    defaultOverlay: 0.55 },
+    { id: 'menu',  label: 'Меню',       defaultOverlay: 0.65 },
+    { id: 'taps',  label: 'Краны 1–28', defaultOverlay: 0.82 },
+  ];
+
+  function loadBgAll() {
+    try { return JSON.parse(localStorage.getItem(BG_KEY)) || {}; } catch { return {}; }
+  }
+  function saveBgAll(obj) { localStorage.setItem(BG_KEY, JSON.stringify(obj)); }
+
+  (function buildBgPanel() {
+    const sb = document.getElementById('sidebar');
+
+    // ── Разделитель в sidebar ──
+    const lbl = document.createElement('div');
+    lbl.style.cssText = 'font-family:Exo 2,sans-serif;font-size:10px;letter-spacing:0.24em;text-transform:uppercase;color:rgba(240,240,240,0.5);padding:18px 20px 10px;border-top:1px solid rgba(255,255,255,0.08);margin-top:8px';
+    lbl.textContent = 'Настройки';
+    sb.appendChild(lbl);
+
+    // ── Кнопка «Фоны» в sidebar ──
+    const bgBtn = document.createElement('div');
+    bgBtn.className = 'sidebar__item';
+    bgBtn.id = 'sb-bg';
+    bgBtn.setAttribute('role', 'button');
+    bgBtn.innerHTML = '<span class="sidebar__num" style="background:#252525;font-size:16px">🖼</span><span class="sidebar__name">Фоны страниц</span>';
+    bgBtn.addEventListener('click', function () {
+      if (currentTap) {
+        document.getElementById('sb-item-' + currentTap).classList.remove('active');
+        document.getElementById('editor-' + currentTap).classList.remove('visible');
+        currentTap = null;
+      }
+      document.querySelectorAll('.sidebar__item').forEach(el => el.classList.remove('active'));
+      bgBtn.classList.add('active');
+      document.getElementById('empty-state').style.display = 'none';
+      document.querySelectorAll('.tap-editor').forEach(el => el.classList.remove('visible'));
+      document.getElementById('bg-editor').classList.add('visible');
+    });
+    sb.appendChild(bgBtn);
+
+    // ── Панель редактора фонов ──
+    const container = document.getElementById('editors-container');
+    const panel = document.createElement('div');
+    panel.className = 'tap-editor';
+    panel.id = 'bg-editor';
+
+    // Табы
+    const tabsHtml = BG_TARGETS.map((t, i) =>
+      `<button class="bg-tab${i===0?' bg-tab--active':''}" data-target="${t.id}" id="bg-tab-${t.id}">${t.label}</button>`
+    ).join('');
+
+    panel.innerHTML = `
+      <div class="tap-editor__header">
+        <div class="tap-editor__badge" style="font-size:22px;background:#252525">🖼</div>
+        <h2 class="tap-editor__heading">Фоны страниц</h2>
+      </div>
+
+      <div class="bg-tabs" id="bg-tabs">${tabsHtml}</div>
+
+      <div id="bg-form-area"></div>
+
+      <div class="save-row">
+        <button class="btn btn--primary" id="bg-save">Сохранить фон</button>
+        <button class="btn btn--danger"  id="bg-reset">Сбросить</button>
+        <span class="save-status" id="bg-status">✓ Сохранено</span>
+      </div>
+    `;
+    container.appendChild(panel);
+
+    // Стили для табов (добавляем динамически)
+    const st = document.createElement('style');
+    st.textContent = `
+      .bg-tabs { display:flex; gap:8px; margin-bottom:24px; flex-wrap:wrap; }
+      .bg-tab {
+        font-family:'Exo 2',sans-serif; font-size:11px; letter-spacing:0.16em;
+        text-transform:uppercase; padding:8px 18px; border-radius:8px;
+        border:1px solid rgba(255,255,255,0.1); background:transparent;
+        color:rgba(240,240,240,0.5); cursor:pointer; transition:all 0.2s;
+      }
+      .bg-tab:hover { color:#f0f0f0; border-color:rgba(255,255,255,0.25); }
+      .bg-tab--active { background:rgba(232,200,50,0.12); border-color:#e8c832; color:#e8c832; }
+      .bg-preview-thumb {
+        width:100%; height:140px; border-radius:10px; object-fit:cover;
+        border:1px solid rgba(255,255,255,0.08); display:block; margin-bottom:8px;
+      }
+      .bg-drop-wide {
+        width:100%; min-height:140px; border:2px dashed rgba(232,200,50,0.35);
+        border-radius:12px; display:flex; flex-direction:column; align-items:center;
+        justify-content:center; gap:10px; cursor:pointer; transition:all 0.2s;
+        background:rgba(255,255,255,0.02); position:relative; overflow:hidden;
+      }
+      .bg-drop-wide:hover,.bg-drop-wide.drag-over { border-color:#e8c832; background:rgba(232,200,50,0.05); }
+      .bg-drop-wide input[type=file] { position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%; }
+      .bg-drop-wide__lbl { font-family:'Exo 2',sans-serif;font-size:11px;letter-spacing:0.14em;text-transform:uppercase;color:rgba(240,240,240,0.4);text-align:center;pointer-events:none;padding:0 16px; }
+      .overlay-row { display:flex;align-items:center;gap:14px; }
+      .overlay-row input[type=range] { flex:1;cursor:pointer; }
+      .overlay-val { font-family:'Exo 2',sans-serif;font-size:12px;color:#e8c832;width:38px;text-align:right;flex-shrink:0; }
+    `;
+    document.head.appendChild(st);
+
+    // ── Текущая цель ──
+    let currentTarget = BG_TARGETS[0].id;
+
+    function buildForm(targetId) {
+      const target = BG_TARGETS.find(t => t.id === targetId);
+      const all = loadBgAll();
+      const cfg = all[targetId] || {};
+      const image = cfg.image || null;
+
+      const area = document.getElementById('bg-form-area');
+      area.innerHTML = `
+        <div class="section-title">Фоновое изображение — ${target.label}</div>
+        <div id="bg-image-section">
+          <div id="bg-drop-area">
+            ${image
+              ? `<img src="${image}" class="bg-preview-thumb" id="bg-thumb"/><div style="display:flex;gap:10px;margin-top:4px"><button class="btn btn--ghost" id="bg-change-img">Заменить</button><button class="btn btn--danger" id="bg-remove-img">Удалить</button></div><input type="file" accept="image/*" id="bg-file-input" style="display:none"/>`
+              : `<div class="bg-drop-wide" id="bg-drop-zone"><input type="file" accept="image/*" id="bg-file-input"/><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" style="opacity:.3"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg><span class="bg-drop-wide__lbl">Нажмите или перетащите изображение<br/>JPG · PNG · WEBP</span></div>`
+            }
+          </div>
+        </div>
+      `;
+
+      // ── Listeners ──
+
+      function handleFileInput(input) {
+        input.addEventListener('change', function() {
+          if (!this.files[0]) return;
+          compressImage(this.files[0], function(dataUrl, name) {
+            const all2 = loadBgAll();
+            if (!all2[targetId]) all2[targetId] = {};
+            all2[targetId].image = dataUrl;
+            saveBgAll(all2);
+            // Перерисовываем дроп-зону с превью
+            const dropArea = document.getElementById('bg-drop-area');
+            dropArea.innerHTML = `<img src="${dataUrl}" class="bg-preview-thumb" id="bg-thumb"/><div style="display:flex;gap:10px;margin-top:4px"><button class="btn btn--ghost" id="bg-change-img">Заменить</button><button class="btn btn--danger" id="bg-remove-img">Удалить</button></div><input type="file" accept="image/*" id="bg-file-input" style="display:none"/>`;
+            document.getElementById('bg-change-img').addEventListener('click', function() {
+              document.getElementById('bg-file-input').click();
+            });
+            document.getElementById('bg-remove-img').addEventListener('click', removeImg);
+            handleFileInput(document.getElementById('bg-file-input'));
+            showToast('✓ Фото загружено');
+          });
+        });
+      }
+
+      function removeImg() {
+        const all2 = loadBgAll();
+        if (all2[targetId]) delete all2[targetId].image;
+        saveBgAll(all2);
+        const dropArea = document.getElementById('bg-drop-area');
+        dropArea.innerHTML = `<div class="bg-drop-wide" id="bg-drop-zone"><input type="file" accept="image/*" id="bg-file-input"/><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" style="opacity:.3"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg><span class="bg-drop-wide__lbl">Нажмите или перетащите изображение<br/>JPG · PNG · WEBP</span></div>`;
+        const fi = document.getElementById('bg-file-input');
+        handleFileInput(fi);
+        const dz = document.getElementById('bg-drop-zone');
+        dz.addEventListener('dragover', e => { e.preventDefault(); dz.classList.add('drag-over'); });
+        dz.addEventListener('dragleave', () => dz.classList.remove('drag-over'));
+        dz.addEventListener('drop', e => { e.preventDefault(); dz.classList.remove('drag-over'); const f=e.dataTransfer.files[0]; if(f&&f.type.startsWith('image/')) { const dt=new DataTransfer(); dt.items.add(f); fi.files=dt.files; fi.dispatchEvent(new Event('change')); } });
+        showToast('Изображение удалено');
+      }
+
+      const fi = document.getElementById('bg-file-input');
+      if (fi) {
+        handleFileInput(fi);
+        if (document.getElementById('bg-drop-zone')) {
+          const dz = document.getElementById('bg-drop-zone');
+          dz.addEventListener('dragover', e => { e.preventDefault(); dz.classList.add('drag-over'); });
+          dz.addEventListener('dragleave', () => dz.classList.remove('drag-over'));
+          dz.addEventListener('drop', e => { e.preventDefault(); dz.classList.remove('drag-over'); const f=e.dataTransfer.files[0]; if(f&&f.type.startsWith('image/')) { const dt=new DataTransfer(); dt.items.add(f); fi.files=dt.files; fi.dispatchEvent(new Event('change')); } });
+        }
+        if (document.getElementById('bg-change-img')) {
+          document.getElementById('bg-change-img').addEventListener('click', () => fi.click());
+        }
+        if (document.getElementById('bg-remove-img')) {
+          document.getElementById('bg-remove-img').addEventListener('click', removeImg);
+        }
+      }
+    }
+
+    // ── Переключение табов ──
+    document.getElementById('bg-tabs').addEventListener('click', function(e) {
+      const btn = e.target.closest('.bg-tab');
+      if (!btn) return;
+      document.querySelectorAll('.bg-tab').forEach(b => b.classList.remove('bg-tab--active'));
+      btn.classList.add('bg-tab--active');
+      currentTarget = btn.dataset.target;
+      buildForm(currentTarget);
+    });
+
+    // ── Сохранение (только изображение сохраняется автоматически при загрузке) ──
+    document.getElementById('bg-save').addEventListener('click', function() {
+      const st2 = document.getElementById('bg-status');
+      st2.classList.add('show');
+      setTimeout(() => st2.classList.remove('show'), 2000);
+      showToast('✓ Фон сохранён');
+    });
+
+    // ── Сброс текущей страницы ──
+    document.getElementById('bg-reset').addEventListener('click', function() {
+      const target = BG_TARGETS.find(t => t.id === currentTarget);
+      if (!confirm(`Сбросить фон "${target.label}"?`)) return;
+      const all2 = loadBgAll();
+      delete all2[currentTarget];
+      saveBgAll(all2);
+      buildForm(currentTarget);
+      showToast(`Фон "${target.label}" сброшен`);
+    });
+
+    // Начальная форма
+    buildForm(currentTarget);
+  })();
+
 </script>
 
 </body>

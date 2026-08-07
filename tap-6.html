@@ -93,6 +93,25 @@
       } catch(e2) {}
     } catch(e) {}
   })();
+</script><script>
+  (function() {
+    var all = {}; try { all = JSON.parse(localStorage.getItem('sv_bg')) || {}; } catch {}
+    var cfg = all['taps'] || {};
+    var overlay = cfg.overlay !== undefined ? cfg.overlay : 0.82;
+    var ov = document.querySelector('.tap-page__overlay');
+    if (ov) ov.style.background = 'rgba(10,10,10,' + overlay + ')';
+    if (cfg.type === 'image' && cfg.image) {
+      var vid = document.querySelector('.tap-page__video');
+      if (vid) vid.style.display = 'none';
+      var pg = document.querySelector('.tap-page');
+      if (pg) { var d = document.createElement('div'); d.style.cssText='position:fixed;inset:0;z-index:0;background:url('+cfg.image+') center/cover no-repeat'; pg.insertBefore(d, pg.firstChild); }
+    } else if (cfg.type === 'color' && cfg.color) {
+      var vid2 = document.querySelector('.tap-page__video');
+      if (vid2) vid2.style.display = 'none';
+      var pg2 = document.querySelector('.tap-page');
+      if (pg2) { var d2 = document.createElement('div'); d2.style.cssText='position:fixed;inset:0;z-index:0;background:'+cfg.color; pg2.insertBefore(d2, pg2.firstChild); }
+    }
+  })();
 </script>
 </body>
 </html>
