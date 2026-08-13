@@ -55,14 +55,19 @@
     /* ── Мета-строка карточки (крепость / цена) ── */
     .beer-card__body {
       display: flex;
-      flex-direction: column;
-      gap: 3px;
+      flex-direction: row;
+      align-items: center;
       flex: 1;
       min-width: 0;
+      gap: 12px;
+    }
+    .beer-card__name {
+      flex-shrink: 0;
     }
     .beer-card__meta {
       display: flex;
-      gap: 14px;
+      flex: 1;
+      justify-content: flex-end;
     }
     .beer-card__abv,
     .beer-card__price {
@@ -73,10 +78,18 @@
       text-transform: uppercase;
       color: rgba(240,240,240,0.45);
       white-space: nowrap;
+      flex: 1;
+      text-align: center;
+    }
+    .beer-card__abv {
+      border-right: 1px solid rgba(255,255,255,0.08);
     }
     .beer-section[data-theme="light"] .beer-card__abv,
     .beer-section[data-theme="light"] .beer-card__price {
       color: rgba(0,0,0,0.4);
+    }
+    .beer-section[data-theme="light"] .beer-card__abv {
+      border-right-color: rgba(0,0,0,0.1);
     }
 
     /* ── Кнопка переключения темы ── */
