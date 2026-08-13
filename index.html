@@ -6,6 +6,15 @@
   <title>Синтез Вкуса — Магазин пивных напитков</title>
   <meta name="description" content="Синтез Вкуса — магазин пивных напитков с широким ассортиментом крафтового и классического пива." />
   <link rel="stylesheet" href="style.css" />
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+  <script src="firebase-config.js"></script>
+  <script>
+    if (typeof FIREBASE_CONFIG !== 'undefined' && FIREBASE_CONFIG.apiKey && !FIREBASE_CONFIG.apiKey.startsWith('ВСТАВЬТЕ')) {
+      firebase.initializeApp(FIREBASE_CONFIG);
+    }
+  </script>
+  <script src="db.js"></script>
 </head>
 <body>
 
@@ -173,14 +182,12 @@
   </footer>
 
 <script>
-  (function() {
-    var BG_KEY = 'sv_bg';
-    var all = {}; try { all = JSON.parse(localStorage.getItem(BG_KEY)) || {}; } catch {}
+  (async function() {
+    var all = await SV_DB.loadBgAll();
     var cfg = all['index'] || {};
     var type = cfg.type || 'video';
     var overlay = cfg.overlay !== undefined ? cfg.overlay : 0.55;
 
-    // Применяем оверлей
     var ov = document.querySelector('.hero__overlay');
     if (ov) ov.style.background = 'rgba(0,0,0,' + overlay + ')';
 

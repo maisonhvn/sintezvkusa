@@ -6,6 +6,17 @@
   <title>Редактор кранов — Синтез Вкуса</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Exo+2:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500&display=swap" />
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+  <script src="firebase-config.js"></script>
+  <script>
+    // Инициализация Firebase
+    if (typeof FIREBASE_CONFIG !== 'undefined' && FIREBASE_CONFIG.apiKey && !FIREBASE_CONFIG.apiKey.startsWith('ВСТАВЬТЕ')) {
+      firebase.initializeApp(FIREBASE_CONFIG);
+    }
+  </script>
+  <script src="db.js"></script>
   <style>
     :root {
       --bg:      #161616;
@@ -461,9 +472,6 @@
 <script>
   const TAPS = 28;
 
-  const STORAGE_KEY   = 'sv_taps';
-  const PHOTO_KEY     = 'sv_photos';
-
   const FIELDS = [
     { key: 'name',  label: 'Название пива', type: 'input',    hint: 'Официальное название сорта' },
     { key: 'style', label: 'Стиль',          type: 'input',    hint: 'Например: American IPA, Stout…' },
@@ -475,16 +483,31 @@
     { key: 'price', label: 'Цена',            type: 'input',    hint: '250 руб / литр' },
   ];
 
-  function loadData()      { try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || {}; } catch { return {}; } }
-  function saveData(d)     { localStorage.setItem(STORAGE_KEY, JSON.stringify(d)); }
-  function loadPhotos()    { try { return JSON.parse(localStorage.getItem(PHOTO_KEY))  || {}; } catch { return {}; } }
-  function savePhotos(p)   { localStorage.setItem(PHOTO_KEY,   JSON.stringify(p)); }
-  function getTapData(n)   { return loadData()[n] || {}; }
+  // ── Кеш данных (загружается при старте) ──
+  let _tapsCache  = {};
+  let _photosCache = {};
 
-  function setTapData(n, obj) {
-    const d = loadData(); d[n] = obj; saveData(d);
-    updateSidebarName(n, obj.name);
+  async function initCache() {
+    _tapsCache   = await SV_DB.loadTaps();
+    _photosCache = await SV_DB.loadPhotos();
+    // Обновить sidebar после загрузки
+    for (let n = 1; n <= TAPS; n++) {
+      if (_tapsCache[n] && _tapsCache[n].name) updateSidebarName(n, _tapsCache[n].name);
+    }
+    showFirebaseStatus();
   }
+
+  function showFirebaseStatus() {
+    const sub = document.querySelector('.topbar__sub');
+    if (!sub) return;
+    if (SV_DB.isFirebaseReady()) {
+      sub.innerHTML = 'Синтез Вкуса — <span style="color:#52c87a">●</span> Firebase подключён';
+    } else {
+      sub.innerHTML = 'Синтез Вкуса — <span style="color:#e05252">●</span> Только localStorage (настройте firebase-config.js)';
+    }
+  }
+
+  function getTapData(n)   { return _tapsCache[n] || {}; }
 
   function showToast(msg) {
     const t = document.getElementById('toast');
@@ -567,7 +590,7 @@
 
       container.appendChild(panel);
 
-      document.getElementById('save-' + n).addEventListener('click', (function(nn){ return function(){ saveTap(nn); }; })(n));
+      document.getElementById('save-' + n).addEventListener('click', (function(nn){ return function(){ doSaveTap(nn); }; })(n));
       document.getElementById('clear-' + n).addEventListener('click', (function(nn){ return function(){ clearTap(nn); }; })(n));
       document.getElementById('photo-clear-' + n).addEventListener('click', (function(nn){ return function(){ clearPhoto(nn); }; })(n));
     }
@@ -611,12 +634,15 @@
   }
 
   function processPhoto(n, file) {
-    compressImage(file, function(dataUrl, name) {
-      const photos = loadPhotos();
-      photos[n] = dataUrl;
-      savePhotos(photos);
-      showPhotoPreview(n, dataUrl, name);
-      showToast('✓ Фото сохранено');
+    compressImage(file, async function(dataUrl, name) {
+      try {
+        await SV_DB.savePhoto(n, dataUrl);
+        _photosCache[n] = dataUrl;
+        showPhotoPreview(n, dataUrl, name);
+        showToast('✓ Фото сохранено');
+      } catch(e) {
+        showToast('⚠ Ошибка сохранения фото');
+      }
     });
   }
 
@@ -632,10 +658,9 @@
     if (nm && name) { nm.textContent = name; nm.style.display = 'block'; }
   }
 
-  function clearPhoto(n) {
-    const photos = loadPhotos();
-    delete photos[n];
-    savePhotos(photos);
+  async function clearPhoto(n) {
+    await SV_DB.deletePhoto(n);
+    delete _photosCache[n];
     const drop = document.getElementById('photo-drop-' + n);
     const prev = drop.querySelector('.photo-drop__preview');
     if (prev) prev.remove();
@@ -649,13 +674,12 @@
 
   // ── Populate editor ──
   function populateEditor(n) {
-    const data   = getTapData(n);
-    const photos = loadPhotos();
+    const data = getTapData(n);
     FIELDS.forEach(function(f) {
       const el = document.getElementById('f-' + n + '-' + f.key);
       if (el) el.value = data[f.key] || '';
     });
-    if (photos[n]) showPhotoPreview(n, photos[n], '');
+    if (_photosCache[n]) showPhotoPreview(n, _photosCache[n], '');
     else {
       const drop = document.getElementById('photo-drop-' + n);
       if (!drop) return;
@@ -686,32 +710,43 @@
   }
 
   // ── Save tap ──
-  function saveTap(n) {
+  async function doSaveTap(n) {
+    const btn = document.getElementById('save-' + n);
+    if (btn) { btn.disabled = true; btn.textContent = 'Сохраняем…'; }
     const obj = {};
     FIELDS.forEach(function(f) {
       const el = document.getElementById('f-' + n + '-' + f.key);
       obj[f.key] = el ? el.value.trim() : '';
     });
-    setTapData(n, obj);
-    const st = document.getElementById('status-' + n);
-    st.classList.add('show');
-    setTimeout(function(){ st.classList.remove('show'); }, 2000);
-    showToast('✓ Сохранено');
+    try {
+      await SV_DB.saveTap(n, obj);
+      _tapsCache[n] = obj;
+      updateSidebarName(n, obj.name);
+      const st = document.getElementById('status-' + n);
+      st.classList.add('show');
+      setTimeout(function(){ st.classList.remove('show'); }, 2000);
+      showToast('✓ Сохранено глобально');
+    } catch(e) {
+      showToast('⚠ Ошибка сохранения — проверьте Firebase');
+    } finally {
+      if (btn) { btn.disabled = false; btn.textContent = 'Сохранить кран ' + n; }
+    }
   }
 
   // ── Clear tap ──
-  function clearTap(n) {
+  async function clearTap(n) {
     if (!confirm('Очистить все поля для Крана ' + n + '?')) return;
-    const d = loadData(); delete d[n]; saveData(d);
+    await SV_DB.deleteTap(n);
+    delete _tapsCache[n];
     populateEditor(n);
     updateSidebarName(n, '');
   }
 
   // ── Reset all ──
-  document.getElementById('btn-reset-all').addEventListener('click', function() {
+  document.getElementById('btn-reset-all').addEventListener('click', async function() {
     if (!confirm('Сбросить ВСЕ данные и фото всех 28 кранов?')) return;
-    localStorage.removeItem(STORAGE_KEY);
-    localStorage.removeItem(PHOTO_KEY);
+    await SV_DB.deleteAllData();
+    _tapsCache = {}; _photosCache = {};
     if (currentTap) populateEditor(currentTap);
     for (let n = 1; n <= TAPS; n++) updateSidebarName(n, '');
     showToast('Все данные сброшены');
@@ -722,25 +757,27 @@
   buildSidebar();
   buildEditors();
   for (let n = 1; n <= TAPS; n++) initPhotoUpload(n);
-  const hash = parseInt(location.hash.replace('#tap-', ''));
-  if (hash >= 1 && hash <= TAPS) selectTap(hash);
+  initCache().then(() => {
+    const hash = parseInt(location.hash.replace('#tap-', ''));
+    if (hash >= 1 && hash <= TAPS) selectTap(hash);
+  });
 
   // ══════════════════════════════════════════
   //  УПРАВЛЕНИЕ ФОНАМИ (Главная / Меню / Краны)
   // ══════════════════════════════════════════
-  const BG_KEY = 'sv_bg';
-
-  // Цели: id → { label, defaultOverlay, defaultVideo }
+  // Цели: id → { label, defaultOverlay }
   const BG_TARGETS = [
     { id: 'index', label: 'Главная',    defaultOverlay: 0.55 },
     { id: 'menu',  label: 'Меню',       defaultOverlay: 0.65 },
     { id: 'taps',  label: 'Краны 1–28', defaultOverlay: 0.82 },
   ];
 
-  function loadBgAll() {
-    try { return JSON.parse(localStorage.getItem(BG_KEY)) || {}; } catch { return {}; }
+  let _bgCache = {};
+  async function initBgCache() {
+    _bgCache = await SV_DB.loadBgAll();
   }
-  function saveBgAll(obj) { localStorage.setItem(BG_KEY, JSON.stringify(obj)); }
+  function loadBgAll() { return _bgCache; }
+  async function saveBgAll(obj) { _bgCache = obj; await SV_DB.saveBgAll(obj); }
 
   (function buildBgPanel() {
     const sb = document.getElementById('sidebar');
@@ -858,12 +895,12 @@
       function handleFileInput(input) {
         input.addEventListener('change', function() {
           if (!this.files[0]) return;
-          compressImage(this.files[0], function(dataUrl, name) {
+          compressImage(this.files[0], async function(dataUrl, name) {
             const all2 = loadBgAll();
             if (!all2[targetId]) all2[targetId] = {};
             all2[targetId].image = dataUrl;
-            saveBgAll(all2);
-            // Перерисовываем дроп-зону с превью
+            all2[targetId].type = 'image';
+            await saveBgAll(all2);
             const dropArea = document.getElementById('bg-drop-area');
             dropArea.innerHTML = `<img src="${dataUrl}" class="bg-preview-thumb" id="bg-thumb"/><div style="display:flex;gap:10px;margin-top:4px"><button class="btn btn--ghost" id="bg-change-img">Заменить</button><button class="btn btn--danger" id="bg-remove-img">Удалить</button></div><input type="file" accept="image/*" id="bg-file-input" style="display:none"/>`;
             document.getElementById('bg-change-img').addEventListener('click', function() {
@@ -871,15 +908,15 @@
             });
             document.getElementById('bg-remove-img').addEventListener('click', removeImg);
             handleFileInput(document.getElementById('bg-file-input'));
-            showToast('✓ Фото загружено');
+            showToast('✓ Фото загружено глобально');
           });
         });
       }
 
-      function removeImg() {
+      async function removeImg() {
         const all2 = loadBgAll();
         if (all2[targetId]) delete all2[targetId].image;
-        saveBgAll(all2);
+        await saveBgAll(all2);
         const dropArea = document.getElementById('bg-drop-area');
         dropArea.innerHTML = `<div class="bg-drop-wide" id="bg-drop-zone"><input type="file" accept="image/*" id="bg-file-input"/><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" style="opacity:.3"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg><span class="bg-drop-wide__lbl">Нажмите или перетащите изображение<br/>JPG · PNG · WEBP</span></div>`;
         const fi = document.getElementById('bg-file-input');
@@ -919,27 +956,27 @@
       buildForm(currentTarget);
     });
 
-    // ── Сохранение (только изображение сохраняется автоматически при загрузке) ──
+    // ── Сохранение ──
     document.getElementById('bg-save').addEventListener('click', function() {
       const st2 = document.getElementById('bg-status');
       st2.classList.add('show');
       setTimeout(() => st2.classList.remove('show'), 2000);
-      showToast('✓ Фон сохранён');
+      showToast('✓ Фон сохранён глобально');
     });
 
     // ── Сброс текущей страницы ──
-    document.getElementById('bg-reset').addEventListener('click', function() {
+    document.getElementById('bg-reset').addEventListener('click', async function() {
       const target = BG_TARGETS.find(t => t.id === currentTarget);
       if (!confirm(`Сбросить фон "${target.label}"?`)) return;
       const all2 = loadBgAll();
       delete all2[currentTarget];
-      saveBgAll(all2);
+      await saveBgAll(all2);
       buildForm(currentTarget);
       showToast(`Фон "${target.label}" сброшен`);
     });
 
     // Начальная форма
-    buildForm(currentTarget);
+    initBgCache().then(() => buildForm(currentTarget));
   })();
 
 </script>

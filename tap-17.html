@@ -6,6 +6,15 @@
   <title>Кран 17 — Синтез Вкуса</title>
   <meta name="description" content="Кран 17 — пиво в магазине Синтез Вкуса." />
   <link rel="stylesheet" href="style.css" />
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+  <script src="firebase-config.js"></script>
+  <script>
+    if (typeof FIREBASE_CONFIG !== 'undefined' && FIREBASE_CONFIG.apiKey && !FIREBASE_CONFIG.apiKey.startsWith('Р’РЎРўРђР’Р¬РўР•')) {
+      firebase.initializeApp(FIREBASE_CONFIG);
+    }
+  </script>
+  <script src="db.js"></script>
 </head>
 <body>
   <nav class="navbar" id="navbar">
@@ -58,44 +67,39 @@
     <nav class="footer__links"><a href="menu.html" id="footer-menu">Меню</a><a href="contacts.html" id="footer-contacts">Контакты</a></nav>
   </footer>
 <script>
-  (function() {
-    var STORAGE_KEY = 'sv_taps'; var PHOTO_KEY = 'sv_photos';
+  (async function() {
     var n = 17;
     try {
-      var all = JSON.parse(localStorage.getItem(STORAGE_KEY)) || {};
-      var d = all[n] || {};
+      var d = await SV_DB.loadTap(n);
       var set = function(id, val, fallback) {
         var el = document.getElementById(id);
         if (el && val) el.textContent = val;
         else if (el && fallback) el.textContent = fallback;
       };
-      set('tap-' + n + '-name',  d.name,  'Название пива');
-      set('tap-' + n + '-style', d.style, 'Стиль пива');
-      set('tap-' + n + '-desc',  d.desc,  'Описание появится после заполнения в редакторе.');
-      set('tap-' + n + '-abv',   d.abv,   '— %');
-      set('tap-' + n + '-ibu',   d.ibu,   '— IBU');
-      set('tap-' + n + '-og',    d.og,    '— °P');
-      set('tap-' + n + '-color', d.color, '—');
-      set('tap-' + n + '-price', d.price, '— руб / литр');
-      // Photo
-      try {
-        var photos = JSON.parse(localStorage.getItem(PHOTO_KEY)) || {};
-        if (photos[n]) {
-          var panel = document.getElementById('tap-' + n + '-photo');
-          if (panel) {
-            var img = document.createElement('img');
-            img.src = photos[n];
-            img.alt = 'Фото пива на кране ' + n;
-            img.className = 'tap-page__photo';
-            panel.parentNode.replaceChild(img, panel);
-          }
+      set('tap-' + n + '-name',  d.name,  'РќР°Р·РІР°РЅРёРµ РїРёРІР°');
+      set('tap-' + n + '-style', d.style, 'РЎС‚РёР»СЊ РїРёРІР°');
+      set('tap-' + n + '-desc',  d.desc,  'РћРїРёСЃР°РЅРёРµ РїРѕСЏРІРёС‚СЃСЏ РїРѕСЃР»Рµ Р·Р°РїРѕР»РЅРµРЅРёСЏ РІ СЂРµРґР°РєС‚РѕСЂРµ.');
+      set('tap-' + n + '-abv',   d.abv,   'вЂ” %');
+      set('tap-' + n + '-ibu',   d.ibu,   'вЂ” IBU');
+      set('tap-' + n + '-og',    d.og,    'вЂ” В°P');
+      set('tap-' + n + '-color', d.color, 'вЂ”');
+      set('tap-' + n + '-price', d.price, 'вЂ” СЂСѓР± / Р»РёС‚СЂ');
+      var photoUrl = await SV_DB.loadPhoto(n);
+      if (photoUrl) {
+        var panel = document.getElementById('tap-' + n + '-photo');
+        if (panel) {
+          var img = document.createElement('img');
+          img.src = photoUrl;
+          img.alt = 'Р¤РѕС‚Рѕ РїРёРІР° РЅР° РєСЂР°РЅРµ ' + n;
+          img.className = 'tap-page__photo';
+          panel.parentNode.replaceChild(img, panel);
         }
-      } catch(e2) {}
-    } catch(e) {}
+      }
+    } catch(e) { console.warn('tap data load error', e); }
   })();
 </script><script>
-  (function() {
-    var all = {}; try { all = JSON.parse(localStorage.getItem('sv_bg')) || {}; } catch {}
+  (async function() {
+    var all = await SV_DB.loadBgAll();
     var cfg = all['taps'] || {};
     var overlay = cfg.overlay !== undefined ? cfg.overlay : 0.82;
     var ov = document.querySelector('.tap-page__overlay');

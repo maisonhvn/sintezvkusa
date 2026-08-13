@@ -5,6 +5,15 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Меню — Синтез Вкуса</title>
   <link rel="stylesheet" href="style.css" />
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+  <script src="firebase-config.js"></script>
+  <script>
+    if (typeof FIREBASE_CONFIG !== 'undefined' && FIREBASE_CONFIG.apiKey && !FIREBASE_CONFIG.apiKey.startsWith('ВСТАВЬТЕ')) {
+      firebase.initializeApp(FIREBASE_CONFIG);
+    }
+  </script>
+  <script src="db.js"></script>
   <style>
     /* ── Светлая тема меню ── */
     .beer-section[data-theme="light"] {
@@ -213,13 +222,9 @@
   </main>
 
 <script>
-  const STORAGE_KEY = 'sv_taps';
-  const BG_KEY      = 'sv_bg';
-
-  // ── Загрузка названий из localStorage ──
-  function loadMenuNames() {
-    let data = {};
-    try { data = JSON.parse(localStorage.getItem(STORAGE_KEY)) || {}; } catch {}
+  // ── Загрузка названий из Firebase/localStorage ──
+  async function loadMenuNames() {
+    const data = await SV_DB.loadTaps();
     for (let n = 1; n <= 28; n++) {
       const el = document.getElementById('menu-name-' + n);
       if (el && data[n] && data[n].name) {
@@ -229,10 +234,9 @@
   }
 
   // ── Применение фона ──
-  function applyBackground() {
-    var all = {}; try { all = JSON.parse(localStorage.getItem('sv_bg')) || {}; } catch {}
+  async function applyBackground() {
+    var all = await SV_DB.loadBgAll();
     var cfg = all['menu'] || {};
-    var type    = cfg.type    || 'video';
     var overlay = cfg.overlay !== undefined ? cfg.overlay : 0.65;
     var video   = document.getElementById('menu-bg-video');
     var bgImage = document.getElementById('menu-bg-image');
@@ -251,7 +255,6 @@
       bgImage.style.cssText = '';
     }
   }
-
 
   // ── Скрытие навбара по клику на заголовок ──
   const menuTitle  = document.getElementById('menu-title');
