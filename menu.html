@@ -90,10 +90,17 @@
     /* ── Заголовок колонок ── */
     .beer-grid-header {
       display: grid;
-      grid-template-columns: 36px 1fr 70px 100px 36px 1fr 70px 100px;
+      grid-template-columns: repeat(2, 1fr);
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+    }
+    .beer-grid-header__col {
+      display: grid;
+      grid-template-columns: 36px 1fr 70px 100px;
       gap: 0 16px;
       padding: 6px 40px;
-      border-bottom: 1px solid rgba(255,255,255,0.1);
+    }
+    .beer-grid-header__col:first-child {
+      border-right: 1px solid rgba(255,255,255,0.08);
     }
     .beer-grid-header__label {
       font-family: 'Exo 2', sans-serif;
@@ -107,6 +114,9 @@
     .beer-grid-header__label:nth-child(2) { text-align: left; }
     .beer-section[data-theme="light"] .beer-grid-header {
       border-bottom-color: rgba(0,0,0,0.1);
+    }
+    .beer-section[data-theme="light"] .beer-grid-header__col:first-child {
+      border-right-color: rgba(0,0,0,0.1);
     }
     .beer-section[data-theme="light"] .beer-grid-header__label {
       color: rgba(0,0,0,0.35);
@@ -165,14 +175,18 @@
     <div class="menu__content">
       <div class="beer-menu-title" id="menu-title">МЕНЮ</div>
       <div class="beer-grid-header">
-        <span class="beer-grid-header__label"></span>
-        <span class="beer-grid-header__label"></span>
-        <span class="beer-grid-header__label">Крепость</span>
-        <span class="beer-grid-header__label">Цена</span>
-        <span class="beer-grid-header__label"></span>
-        <span class="beer-grid-header__label"></span>
-        <span class="beer-grid-header__label">Крепость</span>
-        <span class="beer-grid-header__label">Цена</span>
+        <div class="beer-grid-header__col">
+          <span class="beer-grid-header__label"></span>
+          <span class="beer-grid-header__label"></span>
+          <span class="beer-grid-header__label">Крепость</span>
+          <span class="beer-grid-header__label">Цена</span>
+        </div>
+        <div class="beer-grid-header__col">
+          <span class="beer-grid-header__label"></span>
+          <span class="beer-grid-header__label"></span>
+          <span class="beer-grid-header__label">Крепость</span>
+          <span class="beer-grid-header__label">Цена</span>
+        </div>
       </div>
       <div class="beer-grid beer-grid--28" id="beer-grid">
 
