@@ -66,11 +66,10 @@
     .beer-card__abv,
     .beer-card__price {
       font-family: 'Exo 2', sans-serif;
-      font-size: 10px;
-      font-weight: 500;
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
-      color: rgba(240,240,240,0.45);
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      color: rgba(240,240,240,0.9);
       white-space: nowrap;
       text-align: center;
       display: flex;
@@ -82,10 +81,35 @@
     }
     .beer-section[data-theme="light"] .beer-card__abv,
     .beer-section[data-theme="light"] .beer-card__price {
-      color: rgba(0,0,0,0.4);
+      color: rgba(0,0,0,0.75);
     }
     .beer-section[data-theme="light"] .beer-card__abv {
       border-left-color: rgba(0,0,0,0.1);
+    }
+
+    /* ── Заголовок колонок ── */
+    .beer-grid-header {
+      display: grid;
+      grid-template-columns: 36px 1fr 70px 100px;
+      gap: 0 16px;
+      padding: 6px 40px;
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+    }
+    .beer-grid-header__label {
+      font-family: 'Exo 2', sans-serif;
+      font-size: 9px;
+      font-weight: 600;
+      letter-spacing: 0.26em;
+      text-transform: uppercase;
+      color: rgba(240,240,240,0.35);
+      text-align: center;
+    }
+    .beer-grid-header__label:nth-child(2) { text-align: left; }
+    .beer-section[data-theme="light"] .beer-grid-header {
+      border-bottom-color: rgba(0,0,0,0.1);
+    }
+    .beer-section[data-theme="light"] .beer-grid-header__label {
+      color: rgba(0,0,0,0.35);
     }
 
     /* ── Кнопка переключения темы ── */
@@ -140,6 +164,12 @@
 
     <div class="menu__content">
       <div class="beer-menu-title" id="menu-title">МЕНЮ</div>
+      <div class="beer-grid-header">
+        <span class="beer-grid-header__label"></span>
+        <span class="beer-grid-header__label"></span>
+        <span class="beer-grid-header__label">Крепость</span>
+        <span class="beer-grid-header__label">Цена</span>
+      </div>
       <div class="beer-grid beer-grid--28" id="beer-grid">
 
       <a href="tap-1.html" class="beer-card beer-card--link" id="beer-1"><span class="beer-card__num">01</span><span class="beer-card__name" id="menu-name-1">Сорт пива</span><span class="beer-card__abv" id="menu-abv-1">0%</span><span class="beer-card__price" id="menu-price-1">0 руб</span></a>
