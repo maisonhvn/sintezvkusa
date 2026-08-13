@@ -55,8 +55,9 @@
     /* ── Таблица: grid с фиксированными колонками ── */
     .beer-card {
       display: grid !important;
-      grid-template-columns: 36px 1fr 70px 100px;
-      gap: 0 16px;
+      grid-template-columns: 28px 1fr 55px 75px;
+      gap: 0 8px;
+      padding: 0 10px !important;
     }
     .beer-card__name {
       overflow: hidden;
@@ -95,9 +96,9 @@
     }
     .beer-grid-header__col {
       display: grid;
-      grid-template-columns: 36px 1fr 70px 100px;
-      gap: 0 16px;
-      padding: 6px 40px;
+      grid-template-columns: 28px 1fr 55px 75px;
+      gap: 0 8px;
+      padding: 6px 10px;
     }
     .beer-grid-header__col:first-child {
       border-right: 1px solid rgba(255,255,255,0.08);
@@ -155,8 +156,6 @@
       <button class="theme-toggle" id="theme-toggle" aria-label="Переключить тему" title="Светлая / тёмная тема">
         <span id="theme-icon">☀</span>
       </button>
-      <a href="menu.html" class="nav-link active" id="nav-menu">Меню</a>
-      <a href="contacts.html" class="nav-link" id="nav-contacts">Контакты</a>
     </div>
   </nav>
 
@@ -173,7 +172,6 @@
     <div class="menu__overlay"></div>
 
     <div class="menu__content">
-      <div class="beer-menu-title" id="menu-title">МЕНЮ</div>
       <div class="beer-grid-header">
         <div class="beer-grid-header__col">
           <span class="beer-grid-header__label"></span>
@@ -260,23 +258,6 @@
       bgImage.style.cssText = '';
     }
   }
-
-  // ── Скрытие навбара по клику на заголовок ──
-  const menuTitle  = document.getElementById('menu-title');
-  const navbar     = document.getElementById('navbar');
-  const beerSection = document.querySelector('.beer-section');
-  let navHidden = false;
-
-  menuTitle.addEventListener('click', () => {
-    navHidden = !navHidden;
-    if (navHidden) {
-      navbar.classList.add('navbar--hidden');
-      beerSection.classList.add('navbar-hidden');
-    } else {
-      navbar.classList.remove('navbar--hidden');
-      beerSection.classList.remove('navbar-hidden');
-    }
-  });
 
   loadMenuNames();
   applyBackground();
