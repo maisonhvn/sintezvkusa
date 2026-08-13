@@ -640,8 +640,8 @@ a { text-decoration: none; color: inherit; }
   letter-spacing: 0;
   color: #111;
   background: var(--yellow);
-  width: 34px;
-  height: 34px;
+  width: 26px;
+  height: 26px;
   border-radius: 50%;
   display: inline-flex;
   align-items: center;
