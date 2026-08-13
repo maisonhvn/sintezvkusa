@@ -90,7 +90,7 @@
     /* ── Заголовок колонок ── */
     .beer-grid-header {
       display: grid;
-      grid-template-columns: 36px 1fr 70px 100px;
+      grid-template-columns: 36px 1fr 70px 100px 36px 1fr 70px 100px;
       gap: 0 16px;
       padding: 6px 40px;
       border-bottom: 1px solid rgba(255,255,255,0.1);
@@ -165,6 +165,10 @@
     <div class="menu__content">
       <div class="beer-menu-title" id="menu-title">МЕНЮ</div>
       <div class="beer-grid-header">
+        <span class="beer-grid-header__label"></span>
+        <span class="beer-grid-header__label"></span>
+        <span class="beer-grid-header__label">Крепость</span>
+        <span class="beer-grid-header__label">Цена</span>
         <span class="beer-grid-header__label"></span>
         <span class="beer-grid-header__label"></span>
         <span class="beer-grid-header__label">Крепость</span>
