@@ -518,14 +518,13 @@
 
   // ── Sidebar ──
   function buildSidebar() {
-    const sb   = document.getElementById('sidebar');
-    const data = loadData();
+    const sb = document.getElementById('sidebar');
     for (let n = 1; n <= TAPS; n++) {
       const item = document.createElement('div');
       item.className = 'sidebar__item';
       item.id = 'sb-item-' + n;
       item.setAttribute('role', 'button');
-      item.innerHTML = '<span class="sidebar__num">' + n + '</span><span class="sidebar__name" id="sb-name-' + n + '">' + (data[n] && data[n].name ? data[n].name : 'Кран ' + n) + '</span>';
+      item.innerHTML = '<span class="sidebar__num">' + n + '</span><span class="sidebar__name" id="sb-name-' + n + '">Кран ' + n + '</span>';
       item.addEventListener('click', (function(nn){ return function(){ selectTap(nn); }; })(n));
       sb.appendChild(item);
     }
