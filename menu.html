@@ -52,22 +52,16 @@
       border-right-color: rgba(0,0,0,0.1);
     }
 
-    /* ── Мета-строка карточки (крепость / цена) ── */
-    .beer-card__body {
-      display: flex;
-      flex-direction: row;
-      align-items: center;
-      flex: 1;
-      min-width: 0;
-      gap: 12px;
+    /* ── Таблица: grid с фиксированными колонками ── */
+    .beer-card {
+      display: grid !important;
+      grid-template-columns: 36px 1fr 70px 100px;
+      gap: 0 16px;
     }
     .beer-card__name {
-      flex-shrink: 0;
-    }
-    .beer-card__meta {
-      display: flex;
-      flex: 1;
-      justify-content: flex-end;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
     }
     .beer-card__abv,
     .beer-card__price {
@@ -78,18 +72,20 @@
       text-transform: uppercase;
       color: rgba(240,240,240,0.45);
       white-space: nowrap;
-      flex: 1;
       text-align: center;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
     .beer-card__abv {
-      border-right: 1px solid rgba(255,255,255,0.08);
+      border-left: 1px solid rgba(255,255,255,0.08);
     }
     .beer-section[data-theme="light"] .beer-card__abv,
     .beer-section[data-theme="light"] .beer-card__price {
       color: rgba(0,0,0,0.4);
     }
     .beer-section[data-theme="light"] .beer-card__abv {
-      border-right-color: rgba(0,0,0,0.1);
+      border-left-color: rgba(0,0,0,0.1);
     }
 
     /* ── Кнопка переключения темы ── */
@@ -146,34 +142,34 @@
       <div class="beer-menu-title" id="menu-title">МЕНЮ</div>
       <div class="beer-grid beer-grid--28" id="beer-grid">
 
-      <a href="tap-1.html" class="beer-card beer-card--link" id="beer-1"><span class="beer-card__num">01</span><div class="beer-card__body"><span class="beer-card__name" id="menu-name-1">Сорт пива</span><div class="beer-card__meta"><span class="beer-card__abv" id="menu-abv-1">0%</span><span class="beer-card__price" id="menu-price-1">0 руб</span></div></div></a>
-      <a href="tap-2.html" class="beer-card beer-card--link" id="beer-2"><span class="beer-card__num">02</span><div class="beer-card__body"><span class="beer-card__name" id="menu-name-2">Сорт пива</span><div class="beer-card__meta"><span class="beer-card__abv" id="menu-abv-2">0%</span><span class="beer-card__price" id="menu-price-2">0 руб</span></div></div></a>
-      <a href="tap-3.html" class="beer-card beer-card--link" id="beer-3"><span class="beer-card__num">03</span><div class="beer-card__body"><span class="beer-card__name" id="menu-name-3">Сорт пива</span><div class="beer-card__meta"><span class="beer-card__abv" id="menu-abv-3">0%</span><span class="beer-card__price" id="menu-price-3">0 руб</span></div></div></a>
-      <a href="tap-4.html" class="beer-card beer-card--link" id="beer-4"><span class="beer-card__num">04</span><div class="beer-card__body"><span class="beer-card__name" id="menu-name-4">Сорт пива</span><div class="beer-card__meta"><span class="beer-card__abv" id="menu-abv-4">0%</span><span class="beer-card__price" id="menu-price-4">0 руб</span></div></div></a>
-      <a href="tap-5.html" class="beer-card beer-card--link" id="beer-5"><span class="beer-card__num">05</span><div class="beer-card__body"><span class="beer-card__name" id="menu-name-5">Сорт пива</span><div class="beer-card__meta"><span class="beer-card__abv" id="menu-abv-5">0%</span><span class="beer-card__price" id="menu-price-5">0 руб</span></div></div></a>
-      <a href="tap-6.html" class="beer-card beer-card--link" id="beer-6"><span class="beer-card__num">06</span><div class="beer-card__body"><span class="beer-card__name" id="menu-name-6">Сорт пива</span><div class="beer-card__meta"><span class="beer-card__abv" id="menu-abv-6">0%</span><span class="beer-card__price" id="menu-price-6">0 руб</span></div></div></a>
-      <a href="tap-7.html" class="beer-card beer-card--link" id="beer-7"><span class="beer-card__num">07</span><div class="beer-card__body"><span class="beer-card__name" id="menu-name-7">Сорт пива</span><div class="beer-card__meta"><span class="beer-card__abv" id="menu-abv-7">0%</span><span class="beer-card__price" id="menu-price-7">0 руб</span></div></div></a>
-      <a href="tap-8.html" class="beer-card beer-card--link" id="beer-8"><span class="beer-card__num">08</span><div class="beer-card__body"><span class="beer-card__name" id="menu-name-8">Сорт пива</span><div class="beer-card__meta"><span class="beer-card__abv" id="menu-abv-8">0%</span><span class="beer-card__price" id="menu-price-8">0 руб</span></div></div></a>
-      <a href="tap-9.html" class="beer-card beer-card--link" id="beer-9"><span class="beer-card__num">09</span><div class="beer-card__body"><span class="beer-card__name" id="menu-name-9">Сорт пива</span><div class="beer-card__meta"><span class="beer-card__abv" id="menu-abv-9">0%</span><span class="beer-card__price" id="menu-price-9">0 руб</span></div></div></a>
-      <a href="tap-10.html" class="beer-card beer-card--link" id="beer-10"><span class="beer-card__num">10</span><div class="beer-card__body"><span class="beer-card__name" id="menu-name-10">Сорт пива</span><div class="beer-card__meta"><span class="beer-card__abv" id="menu-abv-10">0%</span><span class="beer-card__price" id="menu-price-10">0 руб</span></div></div></a>
-      <a href="tap-11.html" class="beer-card beer-card--link" id="beer-11"><span class="beer-card__num">11</span><div class="beer-card__body"><span class="beer-card__name" id="menu-name-11">Сорт пива</span><div class="beer-card__meta"><span class="beer-card__abv" id="menu-abv-11">0%</span><span class="beer-card__price" id="menu-price-11">0 руб</span></div></div></a>
-      <a href="tap-12.html" class="beer-card beer-card--link" id="beer-12"><span class="beer-card__num">12</span><div class="beer-card__body"><span class="beer-card__name" id="menu-name-12">Сорт пива</span><div class="beer-card__meta"><span class="beer-card__abv" id="menu-abv-12">0%</span><span class="beer-card__price" id="menu-price-12">0 руб</span></div></div></a>
-      <a href="tap-13.html" class="beer-card beer-card--link" id="beer-13"><span class="beer-card__num">13</span><div class="beer-card__body"><span class="beer-card__name" id="menu-name-13">Сорт пива</span><div class="beer-card__meta"><span class="beer-card__abv" id="menu-abv-13">0%</span><span class="beer-card__price" id="menu-price-13">0 руб</span></div></div></a>
-      <a href="tap-14.html" class="beer-card beer-card--link" id="beer-14"><span class="beer-card__num">14</span><div class="beer-card__body"><span class="beer-card__name" id="menu-name-14">Сорт пива</span><div class="beer-card__meta"><span class="beer-card__abv" id="menu-abv-14">0%</span><span class="beer-card__price" id="menu-price-14">0 руб</span></div></div></a>
-      <a href="tap-15.html" class="beer-card beer-card--link" id="beer-15"><span class="beer-card__num">15</span><div class="beer-card__body"><span class="beer-card__name" id="menu-name-15">Сорт пива</span><div class="beer-card__meta"><span class="beer-card__abv" id="menu-abv-15">0%</span><span class="beer-card__price" id="menu-price-15">0 руб</span></div></div></a>
-      <a href="tap-16.html" class="beer-card beer-card--link" id="beer-16"><span class="beer-card__num">16</span><div class="beer-card__body"><span class="beer-card__name" id="menu-name-16">Сорт пива</span><div class="beer-card__meta"><span class="beer-card__abv" id="menu-abv-16">0%</span><span class="beer-card__price" id="menu-price-16">0 руб</span></div></div></a>
-      <a href="tap-17.html" class="beer-card beer-card--link" id="beer-17"><span class="beer-card__num">17</span><div class="beer-card__body"><span class="beer-card__name" id="menu-name-17">Сорт пива</span><div class="beer-card__meta"><span class="beer-card__abv" id="menu-abv-17">0%</span><span class="beer-card__price" id="menu-price-17">0 руб</span></div></div></a>
-      <a href="tap-18.html" class="beer-card beer-card--link" id="beer-18"><span class="beer-card__num">18</span><div class="beer-card__body"><span class="beer-card__name" id="menu-name-18">Сорт пива</span><div class="beer-card__meta"><span class="beer-card__abv" id="menu-abv-18">0%</span><span class="beer-card__price" id="menu-price-18">0 руб</span></div></div></a>
-      <a href="tap-19.html" class="beer-card beer-card--link" id="beer-19"><span class="beer-card__num">19</span><div class="beer-card__body"><span class="beer-card__name" id="menu-name-19">Сорт пива</span><div class="beer-card__meta"><span class="beer-card__abv" id="menu-abv-19">0%</span><span class="beer-card__price" id="menu-price-19">0 руб</span></div></div></a>
-      <a href="tap-20.html" class="beer-card beer-card--link" id="beer-20"><span class="beer-card__num">20</span><div class="beer-card__body"><span class="beer-card__name" id="menu-name-20">Сорт пива</span><div class="beer-card__meta"><span class="beer-card__abv" id="menu-abv-20">0%</span><span class="beer-card__price" id="menu-price-20">0 руб</span></div></div></a>
-      <a href="tap-21.html" class="beer-card beer-card--link" id="beer-21"><span class="beer-card__num">21</span><div class="beer-card__body"><span class="beer-card__name" id="menu-name-21">Сорт пива</span><div class="beer-card__meta"><span class="beer-card__abv" id="menu-abv-21">0%</span><span class="beer-card__price" id="menu-price-21">0 руб</span></div></div></a>
-      <a href="tap-22.html" class="beer-card beer-card--link" id="beer-22"><span class="beer-card__num">22</span><div class="beer-card__body"><span class="beer-card__name" id="menu-name-22">Сорт пива</span><div class="beer-card__meta"><span class="beer-card__abv" id="menu-abv-22">0%</span><span class="beer-card__price" id="menu-price-22">0 руб</span></div></div></a>
-      <a href="tap-23.html" class="beer-card beer-card--link" id="beer-23"><span class="beer-card__num">23</span><div class="beer-card__body"><span class="beer-card__name" id="menu-name-23">Сорт пива</span><div class="beer-card__meta"><span class="beer-card__abv" id="menu-abv-23">0%</span><span class="beer-card__price" id="menu-price-23">0 руб</span></div></div></a>
-      <a href="tap-24.html" class="beer-card beer-card--link" id="beer-24"><span class="beer-card__num">24</span><div class="beer-card__body"><span class="beer-card__name" id="menu-name-24">Сорт пива</span><div class="beer-card__meta"><span class="beer-card__abv" id="menu-abv-24">0%</span><span class="beer-card__price" id="menu-price-24">0 руб</span></div></div></a>
-      <a href="tap-25.html" class="beer-card beer-card--link" id="beer-25"><span class="beer-card__num">25</span><div class="beer-card__body"><span class="beer-card__name" id="menu-name-25">Сорт пива</span><div class="beer-card__meta"><span class="beer-card__abv" id="menu-abv-25">0%</span><span class="beer-card__price" id="menu-price-25">0 руб</span></div></div></a>
-      <a href="tap-26.html" class="beer-card beer-card--link" id="beer-26"><span class="beer-card__num">26</span><div class="beer-card__body"><span class="beer-card__name" id="menu-name-26">Сорт пива</span><div class="beer-card__meta"><span class="beer-card__abv" id="menu-abv-26">0%</span><span class="beer-card__price" id="menu-price-26">0 руб</span></div></div></a>
-      <a href="tap-27.html" class="beer-card beer-card--link" id="beer-27"><span class="beer-card__num">27</span><div class="beer-card__body"><span class="beer-card__name" id="menu-name-27">Сорт пива</span><div class="beer-card__meta"><span class="beer-card__abv" id="menu-abv-27">0%</span><span class="beer-card__price" id="menu-price-27">0 руб</span></div></div></a>
-      <a href="tap-28.html" class="beer-card beer-card--link" id="beer-28"><span class="beer-card__num">28</span><div class="beer-card__body"><span class="beer-card__name" id="menu-name-28">Сорт пива</span><div class="beer-card__meta"><span class="beer-card__abv" id="menu-abv-28">0%</span><span class="beer-card__price" id="menu-price-28">0 руб</span></div></div></a>
+      <a href="tap-1.html" class="beer-card beer-card--link" id="beer-1"><span class="beer-card__num">01</span><span class="beer-card__name" id="menu-name-1">Сорт пива</span><span class="beer-card__abv" id="menu-abv-1">0%</span><span class="beer-card__price" id="menu-price-1">0 руб</span></a>
+      <a href="tap-2.html" class="beer-card beer-card--link" id="beer-2"><span class="beer-card__num">02</span><span class="beer-card__name" id="menu-name-2">Сорт пива</span><span class="beer-card__abv" id="menu-abv-2">0%</span><span class="beer-card__price" id="menu-price-2">0 руб</span></a>
+      <a href="tap-3.html" class="beer-card beer-card--link" id="beer-3"><span class="beer-card__num">03</span><span class="beer-card__name" id="menu-name-3">Сорт пива</span><span class="beer-card__abv" id="menu-abv-3">0%</span><span class="beer-card__price" id="menu-price-3">0 руб</span></a>
+      <a href="tap-4.html" class="beer-card beer-card--link" id="beer-4"><span class="beer-card__num">04</span><span class="beer-card__name" id="menu-name-4">Сорт пива</span><span class="beer-card__abv" id="menu-abv-4">0%</span><span class="beer-card__price" id="menu-price-4">0 руб</span></a>
+      <a href="tap-5.html" class="beer-card beer-card--link" id="beer-5"><span class="beer-card__num">05</span><span class="beer-card__name" id="menu-name-5">Сорт пива</span><span class="beer-card__abv" id="menu-abv-5">0%</span><span class="beer-card__price" id="menu-price-5">0 руб</span></a>
+      <a href="tap-6.html" class="beer-card beer-card--link" id="beer-6"><span class="beer-card__num">06</span><span class="beer-card__name" id="menu-name-6">Сорт пива</span><span class="beer-card__abv" id="menu-abv-6">0%</span><span class="beer-card__price" id="menu-price-6">0 руб</span></a>
+      <a href="tap-7.html" class="beer-card beer-card--link" id="beer-7"><span class="beer-card__num">07</span><span class="beer-card__name" id="menu-name-7">Сорт пива</span><span class="beer-card__abv" id="menu-abv-7">0%</span><span class="beer-card__price" id="menu-price-7">0 руб</span></a>
+      <a href="tap-8.html" class="beer-card beer-card--link" id="beer-8"><span class="beer-card__num">08</span><span class="beer-card__name" id="menu-name-8">Сорт пива</span><span class="beer-card__abv" id="menu-abv-8">0%</span><span class="beer-card__price" id="menu-price-8">0 руб</span></a>
+      <a href="tap-9.html" class="beer-card beer-card--link" id="beer-9"><span class="beer-card__num">09</span><span class="beer-card__name" id="menu-name-9">Сорт пива</span><span class="beer-card__abv" id="menu-abv-9">0%</span><span class="beer-card__price" id="menu-price-9">0 руб</span></a>
+      <a href="tap-10.html" class="beer-card beer-card--link" id="beer-10"><span class="beer-card__num">10</span><span class="beer-card__name" id="menu-name-10">Сорт пива</span><span class="beer-card__abv" id="menu-abv-10">0%</span><span class="beer-card__price" id="menu-price-10">0 руб</span></a>
+      <a href="tap-11.html" class="beer-card beer-card--link" id="beer-11"><span class="beer-card__num">11</span><span class="beer-card__name" id="menu-name-11">Сорт пива</span><span class="beer-card__abv" id="menu-abv-11">0%</span><span class="beer-card__price" id="menu-price-11">0 руб</span></a>
+      <a href="tap-12.html" class="beer-card beer-card--link" id="beer-12"><span class="beer-card__num">12</span><span class="beer-card__name" id="menu-name-12">Сорт пива</span><span class="beer-card__abv" id="menu-abv-12">0%</span><span class="beer-card__price" id="menu-price-12">0 руб</span></a>
+      <a href="tap-13.html" class="beer-card beer-card--link" id="beer-13"><span class="beer-card__num">13</span><span class="beer-card__name" id="menu-name-13">Сорт пива</span><span class="beer-card__abv" id="menu-abv-13">0%</span><span class="beer-card__price" id="menu-price-13">0 руб</span></a>
+      <a href="tap-14.html" class="beer-card beer-card--link" id="beer-14"><span class="beer-card__num">14</span><span class="beer-card__name" id="menu-name-14">Сорт пива</span><span class="beer-card__abv" id="menu-abv-14">0%</span><span class="beer-card__price" id="menu-price-14">0 руб</span></a>
+      <a href="tap-15.html" class="beer-card beer-card--link" id="beer-15"><span class="beer-card__num">15</span><span class="beer-card__name" id="menu-name-15">Сорт пива</span><span class="beer-card__abv" id="menu-abv-15">0%</span><span class="beer-card__price" id="menu-price-15">0 руб</span></a>
+      <a href="tap-16.html" class="beer-card beer-card--link" id="beer-16"><span class="beer-card__num">16</span><span class="beer-card__name" id="menu-name-16">Сорт пива</span><span class="beer-card__abv" id="menu-abv-16">0%</span><span class="beer-card__price" id="menu-price-16">0 руб</span></a>
+      <a href="tap-17.html" class="beer-card beer-card--link" id="beer-17"><span class="beer-card__num">17</span><span class="beer-card__name" id="menu-name-17">Сорт пива</span><span class="beer-card__abv" id="menu-abv-17">0%</span><span class="beer-card__price" id="menu-price-17">0 руб</span></a>
+      <a href="tap-18.html" class="beer-card beer-card--link" id="beer-18"><span class="beer-card__num">18</span><span class="beer-card__name" id="menu-name-18">Сорт пива</span><span class="beer-card__abv" id="menu-abv-18">0%</span><span class="beer-card__price" id="menu-price-18">0 руб</span></a>
+      <a href="tap-19.html" class="beer-card beer-card--link" id="beer-19"><span class="beer-card__num">19</span><span class="beer-card__name" id="menu-name-19">Сорт пива</span><span class="beer-card__abv" id="menu-abv-19">0%</span><span class="beer-card__price" id="menu-price-19">0 руб</span></a>
+      <a href="tap-20.html" class="beer-card beer-card--link" id="beer-20"><span class="beer-card__num">20</span><span class="beer-card__name" id="menu-name-20">Сорт пива</span><span class="beer-card__abv" id="menu-abv-20">0%</span><span class="beer-card__price" id="menu-price-20">0 руб</span></a>
+      <a href="tap-21.html" class="beer-card beer-card--link" id="beer-21"><span class="beer-card__num">21</span><span class="beer-card__name" id="menu-name-21">Сорт пива</span><span class="beer-card__abv" id="menu-abv-21">0%</span><span class="beer-card__price" id="menu-price-21">0 руб</span></a>
+      <a href="tap-22.html" class="beer-card beer-card--link" id="beer-22"><span class="beer-card__num">22</span><span class="beer-card__name" id="menu-name-22">Сорт пива</span><span class="beer-card__abv" id="menu-abv-22">0%</span><span class="beer-card__price" id="menu-price-22">0 руб</span></a>
+      <a href="tap-23.html" class="beer-card beer-card--link" id="beer-23"><span class="beer-card__num">23</span><span class="beer-card__name" id="menu-name-23">Сорт пива</span><span class="beer-card__abv" id="menu-abv-23">0%</span><span class="beer-card__price" id="menu-price-23">0 руб</span></a>
+      <a href="tap-24.html" class="beer-card beer-card--link" id="beer-24"><span class="beer-card__num">24</span><span class="beer-card__name" id="menu-name-24">Сорт пива</span><span class="beer-card__abv" id="menu-abv-24">0%</span><span class="beer-card__price" id="menu-price-24">0 руб</span></a>
+      <a href="tap-25.html" class="beer-card beer-card--link" id="beer-25"><span class="beer-card__num">25</span><span class="beer-card__name" id="menu-name-25">Сорт пива</span><span class="beer-card__abv" id="menu-abv-25">0%</span><span class="beer-card__price" id="menu-price-25">0 руб</span></a>
+      <a href="tap-26.html" class="beer-card beer-card--link" id="beer-26"><span class="beer-card__num">26</span><span class="beer-card__name" id="menu-name-26">Сорт пива</span><span class="beer-card__abv" id="menu-abv-26">0%</span><span class="beer-card__price" id="menu-price-26">0 руб</span></a>
+      <a href="tap-27.html" class="beer-card beer-card--link" id="beer-27"><span class="beer-card__num">27</span><span class="beer-card__name" id="menu-name-27">Сорт пива</span><span class="beer-card__abv" id="menu-abv-27">0%</span><span class="beer-card__price" id="menu-price-27">0 руб</span></a>
+      <a href="tap-28.html" class="beer-card beer-card--link" id="beer-28"><span class="beer-card__num">28</span><span class="beer-card__name" id="menu-name-28">Сорт пива</span><span class="beer-card__abv" id="menu-abv-28">0%</span><span class="beer-card__price" id="menu-price-28">0 руб</span></a>
 
     </div>   <!-- /beer-grid -->
     </div>   <!-- /menu__content -->
