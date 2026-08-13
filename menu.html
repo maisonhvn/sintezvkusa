@@ -17,14 +17,26 @@
   <script src="db.js"></script>
   <style>
     /* ── Светлая тема меню ── */
+    .menu__video--light {
+      display: none;
+    }
+
     .beer-section[data-theme="light"] {
       background: #ffffff;
     }
 
-    .beer-section[data-theme="light"] .menu__video,
-    .beer-section[data-theme="light"] .menu__bg-image,
-    .beer-section[data-theme="light"] .menu__overlay {
+    .beer-section[data-theme="light"] .menu__video--dark,
+    .beer-section[data-theme="light"] .menu__bg-image {
       display: none !important;
+    }
+
+    .beer-section[data-theme="light"] .menu__video--light {
+      display: block !important;
+    }
+
+    .beer-section[data-theme="light"] .menu__overlay {
+      display: block !important;
+      background: rgba(255, 255, 255, 0.1) !important;
     }
 
     .beer-section[data-theme="light"] .beer-card {
@@ -198,9 +210,14 @@
   <!-- ═══════════════════ BEER GRID ═══════════════════ -->
   <main class="beer-section" id="beer-section">
 
-    <!-- Фоновое видео (по умолчанию) -->
-    <video class="menu__video" id="menu-bg-video" autoplay muted loop playsinline>
+    <!-- Фоновое видео (тёмная тема / по умолчанию) -->
+    <video class="menu__video menu__video--dark" id="menu-bg-video" autoplay muted loop playsinline>
       <source src="assets/4.mp4" type="video/mp4" />
+    </video>
+    <!-- Фоновое видео (светлая тема) -->
+    <video class="menu__video menu__video--light" id="menu-bg-video-light" autoplay muted loop playsinline>
+      <source src="assets/menu_light_bg.mp4" type="video/mp4" />
+      <source src="assets/From Klickpin.com- Natural Makeup Looks for a More Beautiful Life 46528-pin-id-165014773843898996.mp4" type="video/mp4" />
     </video>
     <!-- Фоновое изображение (если выбрано в настройках) -->
     <div class="menu__bg-image" id="menu-bg-image"></div>
@@ -390,16 +407,20 @@
     const section = document.getElementById('beer-section');
     const toggleBtn = document.getElementById('theme-toggle');
     const themeIcon = document.getElementById('theme-icon');
+    const videoDark = document.getElementById('menu-bg-video');
+    const videoLight = document.getElementById('menu-bg-video-light');
 
     function applyTheme(theme) {
       if (theme === 'light') {
         section.setAttribute('data-theme', 'light');
         themeIcon.textContent = '🌙';
         toggleBtn.title = 'Тёмная тема';
+        if (videoLight) videoLight.play().catch(function(){});
       } else {
         section.removeAttribute('data-theme');
         themeIcon.textContent = '☀';
         toggleBtn.title = 'Светлая тема';
+        if (videoDark) videoDark.play().catch(function(){});
       }
     }
 
