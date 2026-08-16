@@ -19,10 +19,17 @@
     /* ── Светлая тема меню ── */
     .menu__video--light {
       display: none;
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      z-index: 0;
+      pointer-events: none;
     }
 
     .beer-section[data-theme="light"] {
-      background: #ffffff;
+      background: #f4f5f7;
     }
 
     .beer-section[data-theme="light"] .menu__video--dark,
@@ -32,11 +39,22 @@
 
     .beer-section[data-theme="light"] .menu__video--light {
       display: block !important;
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      z-index: 0;
+      pointer-events: none;
     }
 
     .beer-section[data-theme="light"] .menu__overlay {
       display: block !important;
-      background: rgba(255, 255, 255, 0.1) !important;
+      background: rgba(255, 255, 255, 0.12) !important;
+      position: absolute;
+      inset: 0;
+      z-index: 1;
+      pointer-events: none;
     }
 
     .beer-section[data-theme="light"] .beer-card {
@@ -211,13 +229,13 @@
   <main class="beer-section" id="beer-section">
 
     <!-- Фоновое видео (тёмная тема / по умолчанию) -->
-    <video class="menu__video menu__video--dark" id="menu-bg-video" autoplay muted loop playsinline>
+    <video class="menu__video menu__video--dark" id="menu-bg-video" autoplay muted loop playsinline webkit-playsinline preload="auto">
       <source src="assets/4.mp4" type="video/mp4" />
     </video>
     <!-- Фоновое видео (светлая тема) -->
-    <video class="menu__video menu__video--light" id="menu-bg-video-light" autoplay muted loop playsinline>
+    <video class="menu__video menu__video--light" id="menu-bg-video-light" autoplay muted loop playsinline webkit-playsinline preload="auto">
       <source src="assets/menu_light_bg.mp4" type="video/mp4" />
-      <source src="assets/From Klickpin.com- Natural Makeup Looks for a More Beautiful Life 46528-pin-id-165014773843898996.mp4" type="video/mp4" />
+      <source src="assets/menu_light_bg.MP4" type="video/mp4" />
     </video>
     <!-- Фоновое изображение (если выбрано в настройках) -->
     <div class="menu__bg-image" id="menu-bg-image"></div>
@@ -410,17 +428,35 @@
     const videoDark = document.getElementById('menu-bg-video');
     const videoLight = document.getElementById('menu-bg-video-light');
 
+    function playVideoSafely(v) {
+      if (!v) return;
+      v.muted = true;
+      v.defaultMuted = true;
+      const p = v.play();
+      if (p !== undefined) {
+        p.catch(function () {
+          const onFirstClick = function () {
+            v.play().catch(function () {});
+            document.removeEventListener('click', onFirstClick);
+          };
+          document.addEventListener('click', onFirstClick, { once: true });
+        });
+      }
+    }
+
     function applyTheme(theme) {
       if (theme === 'light') {
         section.setAttribute('data-theme', 'light');
         themeIcon.textContent = '🌙';
         toggleBtn.title = 'Тёмная тема';
-        if (videoLight) videoLight.play().catch(function(){});
+        if (videoDark) videoDark.pause();
+        playVideoSafely(videoLight);
       } else {
         section.removeAttribute('data-theme');
         themeIcon.textContent = '☀';
         toggleBtn.title = 'Светлая тема';
-        if (videoDark) videoDark.play().catch(function(){});
+        if (videoLight) videoLight.pause();
+        playVideoSafely(videoDark);
       }
     }
 
