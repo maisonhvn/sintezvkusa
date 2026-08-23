@@ -100,10 +100,8 @@
     }
 
     .beer-card__name {
-      white-space: normal;
-      word-break: break-word;
-      overflow-wrap: anywhere;
-      line-height: 1.2;
+      white-space: nowrap;
+      overflow: hidden;
     }
 
     .beer-card__style,
@@ -453,8 +451,28 @@
       }
     }
 
-    loadMenuNames();
     applyBackground();
+
+    // ── Проверка переполнения названий: если не влезает — перенос + меньший шрифт ──
+    function checkNameOverflow() {
+      for (let n = 1; n <= 28; n++) {
+        const el = document.getElementById('menu-name-' + n);
+        if (!el) continue;
+        el.classList.remove('beer-card__name--small');
+        if (el.scrollWidth > el.offsetWidth) {
+          el.classList.add('beer-card__name--small');
+        }
+      }
+    }
+
+    // Загружаем данные, затем проверяем переполнение после рендера
+    loadMenuNames().then(function() {
+      requestAnimationFrame(function() {
+        requestAnimationFrame(checkNameOverflow);
+      });
+    });
+    // Перепроверяем при изменении размеров окна
+    window.addEventListener('resize', checkNameOverflow);
 
     // ── Переключение светлой / тёмной темы ──
     const THEME_KEY = 'sv_menu_theme';
