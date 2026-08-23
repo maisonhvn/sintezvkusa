@@ -483,7 +483,7 @@ a { text-decoration: none; color: inherit; }
     padding: 0 10px !important;
     min-height: 52px;
   }
-  .beer-card__name { font-size: 16px; }
+  .beer-card__name { font-size: clamp(11px, 3.5vw, 15px); }
 
 }
 
@@ -575,12 +575,12 @@ a { text-decoration: none; color: inherit; }
 
 /* 14-item grid: 2 columns × 7 rows */
 .beer-grid--14 {
-  grid-template-rows: repeat(7, 1fr);
+  grid-template-rows: repeat(7, minmax(44px, auto));
 }
 
 /* 28-item grid: 2 columns × 14 rows */
 .beer-grid--28 {
-  grid-template-rows: repeat(14, 1fr);
+  grid-template-rows: repeat(14, minmax(44px, auto));
 }
 
 
@@ -666,12 +666,16 @@ a { text-decoration: none; color: inherit; }
 
 .beer-card__name {
   font-family: 'Exo 2', sans-serif;
-  font-size: 20px;
+  font-size: clamp(12px, 1.1vw, 18px);
   font-weight: 500;
   letter-spacing: 0.06em;
   text-transform: uppercase;
   color: var(--white);
   transition: color 0.2s ease;
+  white-space: normal;
+  word-break: break-word;
+  overflow-wrap: anywhere;
+  line-height: 1.25;
 }
 
 

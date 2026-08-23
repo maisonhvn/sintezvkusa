@@ -100,9 +100,10 @@
     }
 
     .beer-card__name {
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
+      white-space: normal;
+      word-break: break-word;
+      overflow-wrap: anywhere;
+      line-height: 1.2;
     }
 
     .beer-card__style,
