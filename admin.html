@@ -424,9 +424,172 @@
     .photo-info__name {
       font-size: 12px; color: var(--yellow); font-family: 'Exo 2', sans-serif;
       letter-spacing: 0.08em; display: none;
-    }  </style>
+    }  /* ── LOGIN SCREEN ── */
+    #login-screen {
+      position: fixed;
+      inset: 0;
+      z-index: 9999;
+      background: #111;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .login-box {
+      background: #1e1e1e;
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 16px;
+      padding: 48px 40px;
+      width: 360px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      box-shadow: 0 24px 64px rgba(0,0,0,0.6);
+    }
+    .login-box__logo {
+      font-family: 'Exo 2', sans-serif;
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 0.28em;
+      text-transform: uppercase;
+      color: var(--yellow);
+      text-align: center;
+      margin-bottom: 4px;
+    }
+    .login-box__title {
+      font-family: 'Exo 2', sans-serif;
+      font-size: 18px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-align: center;
+      color: var(--white);
+    }
+    .login-box__field {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .login-box__label {
+      font-family: 'Exo 2', sans-serif;
+      font-size: 10px;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: var(--yellow);
+    }
+    .login-box__input {
+      background: #252525;
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 8px;
+      padding: 12px 16px;
+      color: var(--white);
+      font-family: 'Inter', sans-serif;
+      font-size: 14px;
+      outline: none;
+      transition: border-color 0.2s;
+      width: 100%;
+    }
+    .login-box__input:focus { border-color: rgba(232,200,50,0.5); }
+    .login-box__error {
+      color: var(--red);
+      font-size: 12px;
+      font-family: 'Exo 2', sans-serif;
+      letter-spacing: 0.06em;
+      text-align: center;
+      min-height: 18px;
+    }
+    .login-box__btn {
+      background: var(--yellow);
+      color: #111;
+      border: none;
+      border-radius: 8px;
+      padding: 13px;
+      font-family: 'Exo 2', sans-serif;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: background 0.2s;
+      margin-top: 4px;
+    }
+    .login-box__btn:hover { background: #f0d240; }
+
+    /* ── STATUS CHECKBOXES ── */
+    .status-checks {
+      display: flex;
+      gap: 24px;
+      align-items: center;
+      margin-bottom: 4px;
+    }
+    .status-check {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      cursor: pointer;
+      padding: 10px 18px;
+      border-radius: 10px;
+      border: 1px solid rgba(255,255,255,0.08);
+      background: rgba(255,255,255,0.02);
+      transition: all 0.2s;
+      user-select: none;
+    }
+    .status-check:hover { background: rgba(255,255,255,0.05); }
+    .status-check input[type=checkbox] { display: none; }
+    .status-check__box {
+      width: 20px; height: 20px;
+      border-radius: 5px;
+      border: 2px solid rgba(255,255,255,0.2);
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+      transition: all 0.2s;
+      font-size: 13px;
+    }
+    .status-check__text {
+      font-family: 'Exo 2', sans-serif;
+      font-size: 11px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--dim);
+      transition: color 0.2s;
+    }
+    .status-check.checked-out-of-stock {
+      border-color: rgba(224,82,82,0.5);
+      background: rgba(224,82,82,0.07);
+    }
+    .status-check.checked-out-of-stock .status-check__box {
+      border-color: var(--red);
+      background: var(--red);
+    }
+    .status-check.checked-out-of-stock .status-check__text { color: var(--red); }
+    .status-check.checked-discount {
+      border-color: rgba(82,200,122,0.5);
+      background: rgba(82,200,122,0.07);
+    }
+    .status-check.checked-discount .status-check__box {
+      border-color: var(--green);
+      background: var(--green);
+    }
+    .status-check.checked-discount .status-check__text { color: var(--green); }
+  </style>
 </head>
 <body>
+
+  <!-- ═══ LOGIN SCREEN ═══ -->
+  <div id="login-screen">
+    <div class="login-box">
+      <div class="login-box__logo">⚙ Синтез Вкуса</div>
+      <div class="login-box__title">Вход в панель управления</div>
+      <div class="login-box__field">
+        <label class="login-box__label" for="login-username">Логин</label>
+        <input class="login-box__input" type="text" id="login-username" placeholder="Введите логин" autocomplete="username" />
+      </div>
+      <div class="login-box__field">
+        <label class="login-box__label" for="login-password">Пароль</label>
+        <input class="login-box__input" type="password" id="login-password" placeholder="Введите пароль" autocomplete="current-password" />
+      </div>
+      <div class="login-box__error" id="login-error"></div>
+      <button class="login-box__btn" id="login-btn">Войти</button>
+    </div>
+  </div>
 
   <!-- ═══ TOP BAR ═══ -->
   <header class="topbar" id="topbar">
@@ -581,6 +744,20 @@
         '<div class="section-title">Характеристики</div>' +
         '<div class="form-grid">' + specFields.map(fieldHTML).join('') + '</div>' +
 
+        '<div class="section-title">Статус</div>' +
+        '<div class="status-checks">' +
+          '<label class="status-check" id="check-out-' + n + '">' +
+            '<input type="checkbox" id="f-' + n + '-outOfStock" />' +
+            '<span class="status-check__box" id="chkbox-out-' + n + '">✗</span>' +
+            '<span class="status-check__text">Нет в наличии</span>' +
+          '</label>' +
+          '<label class="status-check" id="check-disc-' + n + '">' +
+            '<input type="checkbox" id="f-' + n + '-discount" />' +
+            '<span class="status-check__box" id="chkbox-disc-' + n + '">✓</span>' +
+            '<span class="status-check__text">Скидка</span>' +
+          '</label>' +
+        '</div>' +
+
         '<div class="save-row">' +
           '<button class="btn btn--primary" id="save-' + n + '">Сохранить кран ' + n + '</button>' +
           '<button class="btn btn--ghost" id="clear-' + n + '">Очистить</button>' +
@@ -592,6 +769,24 @@
       document.getElementById('save-' + n).addEventListener('click', (function(nn){ return function(){ doSaveTap(nn); }; })(n));
       document.getElementById('clear-' + n).addEventListener('click', (function(nn){ return function(){ clearTap(nn); }; })(n));
       document.getElementById('photo-clear-' + n).addEventListener('click', (function(nn){ return function(){ clearPhoto(nn); }; })(n));
+
+      // ── Checkbox logic ──
+      (function(nn) {
+        function syncCheck(checkId, cbxId, cls) {
+          var lbl = document.getElementById(checkId);
+          var inp = document.getElementById('f-' + nn + '-' + cbxId);
+          if (!lbl || !inp) return;
+          function update() {
+            lbl.classList.toggle(cls, inp.checked);
+            var box = lbl.querySelector('.status-check__box');
+            if (box) box.textContent = inp.checked ? '✓' : (cls === 'checked-out-of-stock' ? '✗' : '✓');
+          }
+          inp.addEventListener('change', update);
+          update();
+        }
+        syncCheck('check-out-' + nn, 'outOfStock', 'checked-out-of-stock');
+        syncCheck('check-disc-' + nn, 'discount', 'checked-discount');
+      })(n);
     }
   }
 
@@ -678,6 +873,17 @@
       const el = document.getElementById('f-' + n + '-' + f.key);
       if (el) el.value = data[f.key] || '';
     });
+    // Загрузить флаги статуса
+    var outEl = document.getElementById('f-' + n + '-outOfStock');
+    var discEl = document.getElementById('f-' + n + '-discount');
+    if (outEl) {
+      outEl.checked = !!data.outOfStock;
+      outEl.dispatchEvent(new Event('change'));
+    }
+    if (discEl) {
+      discEl.checked = !!data.discount;
+      discEl.dispatchEvent(new Event('change'));
+    }
     if (_photosCache[n]) showPhotoPreview(n, _photosCache[n], '');
     else {
       const drop = document.getElementById('photo-drop-' + n);
@@ -717,6 +923,11 @@
       const el = document.getElementById('f-' + n + '-' + f.key);
       obj[f.key] = el ? el.value.trim() : '';
     });
+    // Сохранить флаги статуса
+    var outEl = document.getElementById('f-' + n + '-outOfStock');
+    var discEl = document.getElementById('f-' + n + '-discount');
+    obj.outOfStock = outEl ? outEl.checked : false;
+    obj.discount   = discEl ? discEl.checked : false;
     try {
       await SV_DB.saveTap(n, obj);
       _tapsCache[n] = obj;
@@ -751,6 +962,45 @@
     showToast('Все данные сброшены');
   });
 
+
+  // ── Login ──
+  (function() {
+    var ADMIN_LOGIN    = 'sintezvkusa';
+    var ADMIN_PASSWORD = 'admin2024';
+    var SESSION_KEY    = 'sv_admin_auth';
+
+    function unlock() {
+      var screen = document.getElementById('login-screen');
+      if (screen) screen.style.display = 'none';
+    }
+
+    // Если уже аутентифицирован в этой сессии
+    if (sessionStorage.getItem(SESSION_KEY) === '1') {
+      unlock();
+    }
+
+    var loginBtn = document.getElementById('login-btn');
+    var userIn   = document.getElementById('login-username');
+    var passIn   = document.getElementById('login-password');
+    var errEl    = document.getElementById('login-error');
+
+    function tryLogin() {
+      if (userIn.value.trim() === ADMIN_LOGIN && passIn.value === ADMIN_PASSWORD) {
+        sessionStorage.setItem(SESSION_KEY, '1');
+        unlock();
+      } else {
+        errEl.textContent = 'Неверный логин или пароль';
+        passIn.value = '';
+        passIn.focus();
+        setTimeout(function() { errEl.textContent = ''; }, 3000);
+      }
+    }
+
+    if (loginBtn) loginBtn.addEventListener('click', tryLogin);
+    [userIn, passIn].forEach(function(el) {
+      if (el) el.addEventListener('keydown', function(e) { if (e.key === 'Enter') tryLogin(); });
+    });
+  })();
 
   // ── Init ──
   buildSidebar();

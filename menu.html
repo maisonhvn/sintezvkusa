@@ -207,6 +207,31 @@
       border-color: rgba(255, 255, 255, 0.45);
       color: #fff;
     }
+    /* ── Подсветка статуса карточек ── */
+    .beer-card--out-of-stock {
+      background: rgba(224,82,82,0.12) !important;
+      border-color: rgba(224,82,82,0.35) !important;
+    }
+    .beer-card--out-of-stock .beer-card__name {
+      color: rgba(224,82,82,0.9) !important;
+      text-decoration: line-through;
+      text-decoration-color: rgba(224,82,82,0.5);
+    }
+    .beer-card--out-of-stock .beer-card__num {
+      background: rgba(224,82,82,0.25) !important;
+      color: #e05252 !important;
+    }
+    .beer-card--discount {
+      background: rgba(82,200,122,0.10) !important;
+      border-color: rgba(82,200,122,0.35) !important;
+    }
+    .beer-card--discount .beer-card__name {
+      color: rgba(82,200,122,0.95) !important;
+    }
+    .beer-card--discount .beer-card__num {
+      background: rgba(82,200,122,0.25) !important;
+      color: #52c87a !important;
+    }
   </style>
 </head>
 
@@ -248,14 +273,14 @@
           <span class="beer-grid-header__label">Название</span>
           <span class="beer-grid-header__label">Стиль</span>
           <span class="beer-grid-header__label">Алк.%</span>
-          <span class="beer-grid-header__label">Цена</span>
+          <span class="beer-grid-header__label">Цена/л</span>
         </div>
         <div class="beer-grid-header__col">
           <span class="beer-grid-header__label"></span>
           <span class="beer-grid-header__label">Название</span>
           <span class="beer-grid-header__label">Стиль</span>
           <span class="beer-grid-header__label">Алк.%</span>
-          <span class="beer-grid-header__label">Цена</span>
+          <span class="beer-grid-header__label">Цена/л</span>
         </div>
       </div>
       <div class="beer-grid beer-grid--28" id="beer-grid">
@@ -383,14 +408,24 @@
       const data = await SV_DB.loadTaps();
       for (let n = 1; n <= 28; n++) {
         const d = data[n] || {};
-        const nameEl = document.getElementById('menu-name-' + n);
+        const nameEl  = document.getElementById('menu-name-'  + n);
         const styleEl = document.getElementById('menu-style-' + n);
-        const abvEl = document.getElementById('menu-abv-' + n);
+        const abvEl   = document.getElementById('menu-abv-'   + n);
         const priceEl = document.getElementById('menu-price-' + n);
-        if (nameEl && d.name) nameEl.textContent = d.name;
+        const card    = document.getElementById('beer-' + n);
+        if (nameEl  && d.name)  nameEl.textContent  = d.name;
         if (styleEl && d.style) styleEl.textContent = d.style;
-        if (abvEl && d.abv) abvEl.textContent = d.abv;
+        if (abvEl   && d.abv)   abvEl.textContent   = d.abv;
         if (priceEl && d.price) priceEl.textContent = d.price;
+        // Подсветка по статусу
+        if (card) {
+          card.classList.remove('beer-card--out-of-stock', 'beer-card--discount');
+          if (d.outOfStock) {
+            card.classList.add('beer-card--out-of-stock');
+          } else if (d.discount) {
+            card.classList.add('beer-card--discount');
+          }
+        }
       }
     }
 
