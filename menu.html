@@ -29,7 +29,7 @@
     }
 
     .beer-section[data-theme="light"] {
-      background: #f4f5f7;
+      background: transparent;
     }
 
     .beer-section[data-theme="light"] .menu__video--dark,
@@ -50,7 +50,7 @@
 
     .beer-section[data-theme="light"] .menu__overlay {
       display: block !important;
-      background: rgba(255, 255, 255, 0.12) !important;
+      background: rgba(255, 255, 255, 0.30) !important;
       position: absolute;
       inset: 0;
       z-index: 1;
@@ -430,11 +430,12 @@
       var all = await SV_DB.loadBgAll();
       var cfg = all['menu'] || {};
       var type = cfg.type || 'default';
-      var overlay = cfg.overlay !== undefined ? cfg.overlay : 0.65;
+      var overlay = cfg.overlay !== undefined ? cfg.overlay : 0.40;
       var video = document.getElementById('menu-bg-video');
       var bgImage = document.getElementById('menu-bg-image');
       var ov = document.querySelector('.menu__overlay');
 
+      // Устанавливаем overlay для тёмной темы; CSS с !important перекроет для светлой
       if (ov) ov.style.background = 'rgba(0,0,0,' + overlay + ')';
 
       // Очищаем предыдущий кастомный фон
@@ -474,7 +475,7 @@
         if (video) video.style.display = 'none';
         if (bgImage) bgImage.style.cssText = 'position:absolute;inset:0;width:100%;height:100%;z-index:0;background:' + cfg.color;
       } else {
-        // default — показываем встроенное видео
+        // default — показываем встроенное тёмное видео
         if (video) video.style.display = '';
         if (bgImage) bgImage.style.cssText = '';
       }
@@ -510,16 +511,20 @@
     }
 
     function applyTheme(theme) {
+      var ov = document.querySelector('.menu__overlay');
       if (theme === 'light') {
         section.setAttribute('data-theme', 'light');
         themeIcon.textContent = '🌙';
         toggleBtn.title = 'Тёмная тема';
+        // Сбрасываем inline overlay — CSS !important сам применит белый цвет
+        if (ov) ov.style.background = '';
         if (videoDark) videoDark.pause();
         playVideoSafely(videoLight);
       } else {
         section.removeAttribute('data-theme');
         themeIcon.textContent = '☀';
         toggleBtn.title = 'Светлая тема';
+        // overlay уже стоит из applyBackground() — ничего менять не нужно
         if (videoLight) videoLight.pause();
         playVideoSafely(videoDark);
       }

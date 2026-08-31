@@ -515,7 +515,7 @@ a { text-decoration: none; color: inherit; }
 .menu__overlay {
   position: absolute;
   inset: 0;
-  background: rgba(0, 0, 0, 0.65);
+  background: rgba(0, 0, 0, 0.40);
   z-index: 1;
 }
 
