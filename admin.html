@@ -9,6 +9,7 @@
   <!-- Firebase SDK -->
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-storage-compat.js"></script>
   <script src="firebase-config.js"></script>
   <script>
     // Инициализация Firebase
@@ -1114,6 +1115,24 @@
       .overlay-row { display:flex;align-items:center;gap:14px; }
       .overlay-row input[type=range] { flex:1;cursor:pointer; }
       .overlay-val { font-family:'Exo 2',sans-serif;font-size:12px;color:#e8c832;width:38px;text-align:right;flex-shrink:0; }
+      /* ── Тип фона ── */
+      .bg-type-row { display:flex;gap:8px;margin-bottom:18px;flex-wrap:wrap; }
+      .bg-type-btn {
+        font-family:'Exo 2',sans-serif;font-size:10px;letter-spacing:0.16em;text-transform:uppercase;
+        padding:7px 16px;border-radius:8px;border:1px solid rgba(255,255,255,0.1);
+        background:transparent;color:rgba(240,240,240,0.5);cursor:pointer;transition:all 0.2s;
+      }
+      .bg-type-btn:hover{color:#f0f0f0;border-color:rgba(255,255,255,0.3);}
+      .bg-type-btn.active{background:rgba(232,200,50,0.12);border-color:#e8c832;color:#e8c832;}
+      .bg-preview-video {
+        width:100%;height:140px;border-radius:10px;object-fit:cover;
+        border:1px solid rgba(255,255,255,0.08);display:block;margin-bottom:8px;
+      }
+      .bg-size-warning {
+        font-size:11px;color:rgba(224,180,50,0.8);font-family:'Exo 2',sans-serif;
+        letter-spacing:0.06em;padding:8px 12px;background:rgba(232,200,50,0.07);
+        border:1px solid rgba(232,200,50,0.2);border-radius:8px;line-height:1.5;
+      }
     `;
     document.head.appendChild(st);
 
@@ -1124,75 +1143,250 @@
       const target = BG_TARGETS.find(t => t.id === targetId);
       const all = loadBgAll();
       const cfg = all[targetId] || {};
-      const image = cfg.image || null;
+      const currentType = cfg.type || 'default';
 
       const area = document.getElementById('bg-form-area');
+
+      // Определяем активный тип для кнопок
+      const btnTypes = [
+        { id: 'default', label: '🎬 По умолчанию' },
+        { id: 'image',   label: '🖼 Изображение' },
+        { id: 'gif',     label: '🎞 GIF-анимация' },
+        { id: 'video',   label: '📹 Видео (MP4)' },
+      ];
+
+      const typeBtnsHtml = btnTypes.map(b =>
+        `<button class="bg-type-btn${currentType === b.id || (b.id==='default' && !cfg.type) ? ' active' : ''}" data-bgtype="${b.id}" id="bgt-${b.id}">${b.label}</button>`
+      ).join('');
+
       area.innerHTML = `
-        <div class="section-title">Фоновое изображение — ${target.label}</div>
-        <div id="bg-image-section">
-          <div id="bg-drop-area">
-            ${image
-              ? `<img src="${image}" class="bg-preview-thumb" id="bg-thumb"/><div style="display:flex;gap:10px;margin-top:4px"><button class="btn btn--ghost" id="bg-change-img">Заменить</button><button class="btn btn--danger" id="bg-remove-img">Удалить</button></div><input type="file" accept="image/*" id="bg-file-input" style="display:none"/>`
-              : `<div class="bg-drop-wide" id="bg-drop-zone"><input type="file" accept="image/*" id="bg-file-input"/><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" style="opacity:.3"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg><span class="bg-drop-wide__lbl">Нажмите или перетащите изображение<br/>JPG · PNG · WEBP</span></div>`
-            }
-          </div>
-        </div>
+        <div class="section-title">Тип фона — ${target.label}</div>
+        <div class="bg-type-row" id="bg-type-row">${typeBtnsHtml}</div>
+        <div id="bg-media-area"></div>
       `;
 
-      // ── Listeners ──
+      function renderMediaArea(type) {
+        const mediaArea = document.getElementById('bg-media-area');
+        const existingImage = cfg.image || null;
 
-      function handleFileInput(input) {
-        input.addEventListener('change', function() {
-          if (!this.files[0]) return;
-          compressImage(this.files[0], async function(dataUrl, name) {
+        if (type === 'default') {
+          mediaArea.innerHTML = `<p style="color:rgba(240,240,240,0.4);font-family:'Exo 2',sans-serif;font-size:12px;letter-spacing:0.06em;">Используется стандартный видео-фон страницы (встроенный MP4).</p>`;
+        } else if (type === 'image') {
+          // Статичное изображение (JPEG/PNG/WEBP)
+          mediaArea.innerHTML = existingImage
+            ? `<img src="${existingImage}" class="bg-preview-thumb" id="bg-thumb"/>
+               <div style="display:flex;gap:10px;margin-top:4px">
+                 <button class="btn btn--ghost" id="bg-change-img">Заменить</button>
+                 <button class="btn btn--danger" id="bg-remove-img">Удалить</button>
+               </div>
+               <input type="file" accept="image/jpeg,image/png,image/webp" id="bg-file-input" style="display:none"/>`
+            : `<div class="bg-drop-wide" id="bg-drop-zone">
+                 <input type="file" accept="image/jpeg,image/png,image/webp" id="bg-file-input"/>
+                 <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" style="opacity:.3"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>
+                 <span class="bg-drop-wide__lbl">Нажмите или перетащите<br/>JPG · PNG · WEBP</span>
+               </div>`;
+          wireImageInput();
+        } else if (type === 'gif') {
+          // GIF-анимация (хранится как base64 изображение)
+          mediaArea.innerHTML = existingImage && cfg.type === 'gif'
+            ? `<img src="${existingImage}" class="bg-preview-thumb" id="bg-thumb" style="image-rendering:auto;"/>
+               <div style="display:flex;gap:10px;margin-top:4px">
+                 <button class="btn btn--ghost" id="bg-change-img">Заменить GIF</button>
+                 <button class="btn btn--danger" id="bg-remove-img">Удалить</button>
+               </div>
+               <input type="file" accept="image/gif" id="bg-file-input" style="display:none"/>`
+            : `<div class="bg-drop-wide" id="bg-drop-zone">
+                 <input type="file" accept="image/gif" id="bg-file-input"/>
+                 <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" style="opacity:.3"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>
+                 <span class="bg-drop-wide__lbl">Нажмите или перетащите<br/>GIF-анимацию</span>
+               </div>
+               <div class="bg-size-warning" style="margin-top:10px">⚠ GIF хранится как base64. Рекомендуется размер до 5 МБ.</div>`;
+          wireGifInput();
+        } else if (type === 'video') {
+          const existingVideoUrl = cfg.videoUrl || null;
+          mediaArea.innerHTML = existingVideoUrl
+            ? `<video class="bg-preview-video" id="bg-vid-preview" muted autoplay loop playsinline>
+                 <source src="${existingVideoUrl}" />
+               </video>
+               <p style="font-family:'Exo 2',sans-serif;font-size:10px;letter-spacing:0.1em;color:rgba(240,240,240,0.4);margin:6px 0 8px;word-break:break-all;">${existingVideoUrl}</p>
+               <div style="display:flex;gap:10px;">
+                 <button class="btn btn--ghost" id="bg-change-vid">Изменить URL</button>
+                 <button class="btn btn--danger" id="bg-remove-vid">Удалить</button>
+               </div>`
+            : `<div class="field" style="margin-bottom:12px">
+                 <label class="field__label" for="bg-video-url">Прямая ссылка на видео (MP4 / WebM)</label>
+                 <input class="field__input" type="url" id="bg-video-url" placeholder="https://..." />
+               </div>
+               <button class="btn btn--primary" id="bg-video-save-url">Сохранить видео</button>
+               <div class="bg-size-warning" style="margin-top:12px">
+                 💡 Вставьте прямую ссылку на видео-файл. Например, с Google Drive: в настройках файла нажмите «Открыть доступ» и скопируйте ссылку в формате:<br/><code style="color:#e8c832;font-size:11px">https://drive.google.com/uc?export=download&amp;id=ВАШ_ID</code>
+               </div>`;
+          wireVideoInput();
+        }
+      }
+
+      // ── Обработчики ──
+
+      function wireImageInput() {
+        const fi = document.getElementById('bg-file-input');
+        if (!fi) return;
+        fi.addEventListener('change', async function() {
+          const file = this.files[0];
+          if (!file) return;
+          compressImage(file, async function(dataUrl) {
             const all2 = loadBgAll();
             if (!all2[targetId]) all2[targetId] = {};
             all2[targetId].image = dataUrl;
             all2[targetId].type = 'image';
+            cfg.image = dataUrl; cfg.type = 'image';
             await saveBgAll(all2);
-            const dropArea = document.getElementById('bg-drop-area');
-            dropArea.innerHTML = `<img src="${dataUrl}" class="bg-preview-thumb" id="bg-thumb"/><div style="display:flex;gap:10px;margin-top:4px"><button class="btn btn--ghost" id="bg-change-img">Заменить</button><button class="btn btn--danger" id="bg-remove-img">Удалить</button></div><input type="file" accept="image/*" id="bg-file-input" style="display:none"/>`;
-            document.getElementById('bg-change-img').addEventListener('click', function() {
-              document.getElementById('bg-file-input').click();
-            });
-            document.getElementById('bg-remove-img').addEventListener('click', removeImg);
-            handleFileInput(document.getElementById('bg-file-input'));
-            showToast('✓ Фото загружено глобально');
+            renderMediaArea('image');
+            showToast('✓ Изображение загружено');
           });
+        });
+        const dz = document.getElementById('bg-drop-zone');
+        if (dz) {
+          dz.addEventListener('dragover', e => { e.preventDefault(); dz.classList.add('drag-over'); });
+          dz.addEventListener('dragleave', () => dz.classList.remove('drag-over'));
+          dz.addEventListener('drop', e => {
+            e.preventDefault(); dz.classList.remove('drag-over');
+            const f = e.dataTransfer.files[0];
+            if (f && (f.type === 'image/jpeg' || f.type === 'image/png' || f.type === 'image/webp')) {
+              const dt = new DataTransfer(); dt.items.add(f); fi.files = dt.files; fi.dispatchEvent(new Event('change'));
+            }
+          });
+        }
+        const chBtn = document.getElementById('bg-change-img');
+        if (chBtn) chBtn.addEventListener('click', () => fi.click());
+        const rmBtn = document.getElementById('bg-remove-img');
+        if (rmBtn) rmBtn.addEventListener('click', async () => {
+          const all2 = loadBgAll();
+          if (all2[targetId]) { delete all2[targetId].image; all2[targetId].type = 'default'; }
+          cfg.image = null; cfg.type = 'default';
+          await saveBgAll(all2);
+          setActiveTypeBtn('default');
+          renderMediaArea('default');
+          showToast('Изображение удалено');
         });
       }
 
-      async function removeImg() {
-        const all2 = loadBgAll();
-        if (all2[targetId]) delete all2[targetId].image;
-        await saveBgAll(all2);
-        const dropArea = document.getElementById('bg-drop-area');
-        dropArea.innerHTML = `<div class="bg-drop-wide" id="bg-drop-zone"><input type="file" accept="image/*" id="bg-file-input"/><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" style="opacity:.3"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg><span class="bg-drop-wide__lbl">Нажмите или перетащите изображение<br/>JPG · PNG · WEBP</span></div>`;
+      function wireGifInput() {
         const fi = document.getElementById('bg-file-input');
-        handleFileInput(fi);
+        if (!fi) return;
+        fi.addEventListener('change', function() {
+          const file = this.files[0];
+          if (!file) return;
+          const reader = new FileReader();
+          reader.onload = async function(e) {
+            const dataUrl = e.target.result;
+            const all2 = loadBgAll();
+            if (!all2[targetId]) all2[targetId] = {};
+            all2[targetId].image = dataUrl;
+            all2[targetId].type = 'gif';
+            cfg.image = dataUrl; cfg.type = 'gif';
+            await saveBgAll(all2);
+            renderMediaArea('gif');
+            showToast('✓ GIF загружен');
+          };
+          reader.readAsDataURL(file);
+        });
         const dz = document.getElementById('bg-drop-zone');
-        dz.addEventListener('dragover', e => { e.preventDefault(); dz.classList.add('drag-over'); });
-        dz.addEventListener('dragleave', () => dz.classList.remove('drag-over'));
-        dz.addEventListener('drop', e => { e.preventDefault(); dz.classList.remove('drag-over'); const f=e.dataTransfer.files[0]; if(f&&f.type.startsWith('image/')) { const dt=new DataTransfer(); dt.items.add(f); fi.files=dt.files; fi.dispatchEvent(new Event('change')); } });
-        showToast('Изображение удалено');
-      }
-
-      const fi = document.getElementById('bg-file-input');
-      if (fi) {
-        handleFileInput(fi);
-        if (document.getElementById('bg-drop-zone')) {
-          const dz = document.getElementById('bg-drop-zone');
+        if (dz) {
           dz.addEventListener('dragover', e => { e.preventDefault(); dz.classList.add('drag-over'); });
           dz.addEventListener('dragleave', () => dz.classList.remove('drag-over'));
-          dz.addEventListener('drop', e => { e.preventDefault(); dz.classList.remove('drag-over'); const f=e.dataTransfer.files[0]; if(f&&f.type.startsWith('image/')) { const dt=new DataTransfer(); dt.items.add(f); fi.files=dt.files; fi.dispatchEvent(new Event('change')); } });
+          dz.addEventListener('drop', e => {
+            e.preventDefault(); dz.classList.remove('drag-over');
+            const f = e.dataTransfer.files[0];
+            if (f && f.type === 'image/gif') {
+              const dt = new DataTransfer(); dt.items.add(f); fi.files = dt.files; fi.dispatchEvent(new Event('change'));
+            }
+          });
         }
-        if (document.getElementById('bg-change-img')) {
-          document.getElementById('bg-change-img').addEventListener('click', () => fi.click());
-        }
-        if (document.getElementById('bg-remove-img')) {
-          document.getElementById('bg-remove-img').addEventListener('click', removeImg);
-        }
+        const chBtn = document.getElementById('bg-change-img');
+        if (chBtn) chBtn.addEventListener('click', () => fi.click());
+        const rmBtn = document.getElementById('bg-remove-img');
+        if (rmBtn) rmBtn.addEventListener('click', async () => {
+          const all2 = loadBgAll();
+          if (all2[targetId]) { delete all2[targetId].image; all2[targetId].type = 'default'; }
+          cfg.image = null; cfg.type = 'default';
+          await saveBgAll(all2);
+          setActiveTypeBtn('default');
+          renderMediaArea('default');
+          showToast('GIF удалён');
+        });
       }
+
+      function wireVideoInput() {
+        // Режим URL: пользователь вводит прямую ссылку на MP4
+        const saveBtn = document.getElementById('bg-video-save-url');
+        if (saveBtn) {
+          saveBtn.addEventListener('click', async function() {
+            const urlInput = document.getElementById('bg-video-url');
+            const url = urlInput ? urlInput.value.trim() : '';
+            if (!url) { showToast('⚠ Введите ссылку на видео'); return; }
+            const all2 = loadBgAll();
+            if (!all2[targetId]) all2[targetId] = {};
+            delete all2[targetId].image;
+            all2[targetId].type = 'video';
+            all2[targetId].videoUrl = url;
+            cfg.type = 'video';
+            cfg.videoUrl = url;
+            await saveBgAll(all2);
+            renderMediaArea('video');
+            showToast('✓ Ссылка на видео сохранена!');
+          });
+        }
+        // Кнопка «Изменить URL» (когда видео уже есть)
+        const chBtn = document.getElementById('bg-change-vid');
+        if (chBtn) chBtn.addEventListener('click', async () => {
+          const newUrl = prompt('Введите новую ссылку на видео:', cfg.videoUrl || '');
+          if (newUrl === null) return;
+          const url = newUrl.trim();
+          if (!url) return;
+          const all2 = loadBgAll();
+          if (!all2[targetId]) all2[targetId] = {};
+          all2[targetId].type = 'video';
+          all2[targetId].videoUrl = url;
+          cfg.type = 'video';
+          cfg.videoUrl = url;
+          await saveBgAll(all2);
+          renderMediaArea('video');
+          showToast('✓ Ссылка обновлена!');
+        });
+        // Кнопка «Удалить»
+        const rmBtn = document.getElementById('bg-remove-vid');
+        if (rmBtn) rmBtn.addEventListener('click', async () => {
+          const all2 = loadBgAll();
+          if (all2[targetId]) { delete all2[targetId].videoUrl; all2[targetId].type = 'default'; }
+          cfg.type = 'default'; cfg.videoUrl = null;
+          await saveBgAll(all2);
+          setActiveTypeBtn('default');
+          renderMediaArea('default');
+          showToast('Видео удалено');
+        });
+      }
+
+      function setActiveTypeBtn(type) {
+        document.querySelectorAll('.bg-type-btn').forEach(b => b.classList.toggle('active', b.dataset.bgtype === type));
+      }
+
+      // ── Переключение типа ──
+      document.getElementById('bg-type-row').addEventListener('click', async function(e) {
+        const btn = e.target.closest('.bg-type-btn');
+        if (!btn) return;
+        const newType = btn.dataset.bgtype;
+        setActiveTypeBtn(newType);
+        // Обновляем cfg.type в BgAll
+        const all2 = loadBgAll();
+        if (!all2[targetId]) all2[targetId] = {};
+        all2[targetId].type = newType;
+        cfg.type = newType;
+        await saveBgAll(all2);
+        renderMediaArea(newType);
+      });
+
+      // Начальный рендер медиа
+      renderMediaArea(currentType === 'default' || !cfg.type ? 'default' : currentType);
     }
 
     // ── Переключение табов ──

@@ -185,31 +185,49 @@
   (async function() {
     var all = await SV_DB.loadBgAll();
     var cfg = all['index'] || {};
-    var type = cfg.type || 'video';
+    var type = cfg.type || 'default';
     var overlay = cfg.overlay !== undefined ? cfg.overlay : 0.55;
 
     var ov = document.querySelector('.hero__overlay');
     if (ov) ov.style.background = 'rgba(0,0,0,' + overlay + ')';
 
+    var vid = document.querySelector('.hero__video');
+    var hero = document.querySelector('.hero');
+
     if (type === 'image' && cfg.image) {
-      var vid = document.querySelector('.hero__video');
       if (vid) vid.style.display = 'none';
-      var hero = document.querySelector('.hero');
       if (hero) {
         var bgDiv = document.createElement('div');
         bgDiv.style.cssText = 'position:absolute;inset:0;z-index:0;background:url(' + cfg.image + ') center/cover no-repeat';
         hero.insertBefore(bgDiv, hero.firstChild);
       }
+    } else if (type === 'gif' && cfg.image) {
+      if (vid) vid.style.display = 'none';
+      if (hero) {
+        var bgGif = document.createElement('img');
+        bgGif.src = cfg.image;
+        bgGif.style.cssText = 'position:absolute;inset:0;z-index:0;width:100%;height:100%;object-fit:cover;pointer-events:none;';
+        hero.insertBefore(bgGif, hero.firstChild);
+      }
+    } else if (type === 'video' && cfg.videoUrl) {
+      if (vid) vid.style.display = 'none';
+      if (hero) {
+        var bgVid = document.createElement('video');
+        bgVid.autoplay = true; bgVid.muted = true; bgVid.loop = true; bgVid.playsInline = true;
+        bgVid.style.cssText = 'position:absolute;inset:0;z-index:0;width:100%;height:100%;object-fit:cover;pointer-events:none;';
+        bgVid.src = cfg.videoUrl;
+        hero.insertBefore(bgVid, hero.firstChild);
+        bgVid.play().catch(function(){});
+      }
     } else if (type === 'color' && cfg.color) {
-      var vid2 = document.querySelector('.hero__video');
-      if (vid2) vid2.style.display = 'none';
-      var hero2 = document.querySelector('.hero');
-      if (hero2) {
-        var bgDiv2 = document.createElement('div');
-        bgDiv2.style.cssText = 'position:absolute;inset:0;z-index:0;background:' + cfg.color;
-        hero2.insertBefore(bgDiv2, hero2.firstChild);
+      if (vid) vid.style.display = 'none';
+      if (hero) {
+        var bgColor = document.createElement('div');
+        bgColor.style.cssText = 'position:absolute;inset:0;z-index:0;background:' + cfg.color;
+        hero.insertBefore(bgColor, hero.firstChild);
       }
     }
+    // type === 'default' — встроенное видео остаётся
   })();
 </script>
 
